@@ -1,0 +1,39 @@
+/*****************************************
+		SITE  IE8-
+******************************************/
+
+div.mod-languages ul.lang-inline li {
+display:inline-block;
+}
+
+/** 	Resize images 		**/
+
+img, embed, object, video, .scale {
+/* IE7-8 need help adjusting responsive images */
+width: auto;
+}
+
+/** 	MENUS 		**/
+
+.drop-down li ul ul {
+border:3px solid #eee;
+}
+
+
+/****		Others			***/
+
+.background-03 .social-links li a:after,.background-04 .social-links li a:after,.background-05 .social-links li a:after,
+.background-06 .social-links li a:after, .background-07 .social-links li a:after {
+border-color:#777;
+}
+
+/**		background image no repeat 		**/
+
+.bg-no-repeat img {
+width:100%;
+height:100%;
+}
+
+.logo-module {
+margin-bottom:30px;
+}

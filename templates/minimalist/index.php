@@ -11,8 +11,8 @@ $app = JFactory::getApplication();
 $menu = $app->getMenu();
 $lang = JFactory::getLanguage();
 if ($menu->getActive() == $menu->getDefault($lang->getTag())) {
-$js='<div class="js-copyright" ><a class="jslink" target="_blank" href="http://www.template-joomspirit.com/joomla/free-joomla-templates" >free template joomla</a></div>';
-} else {$js='<div class="js-copyright" ><a class="jslink" target="_blank" href="http://www.template-joomspirit.com/joomla/free-joomla-templates" >free Joomla templates</a></div>'; }
+$js='<div class="js-copyright" ><a class="jslink" target="_blank" href="http:#" >&copy; Janv 2015</a></div>';
+} else {$js='<div class="js-copyright" ><a class="jslink" target="_blank" href="#" >&copy; Janv 2015</a></div>'; }
 
 if ($this->params->get('fontSize') == '') 
 { $fontSize ='0.85em'; } 

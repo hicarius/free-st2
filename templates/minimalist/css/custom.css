@@ -1,0 +1,160 @@
+#ybox1 {
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border:5px solid #cccccc;
+    background-color: #fff;
+    width: 373px;
+}
+
+ol.labels {
+    counter-reset: li-counter;
+    list-style-type: none;
+    margin-top: 10px;
+    margin-left: 17px;
+}
+
+.jslink {
+    background: none;
+    float: left;
+    height: 8px;
+    text-indent: 0px;
+    width: 144px;
+}
+
+.paypal_payer_button {
+    font-weight: bold;
+    margin: 0 auto;
+    padding: 10px;
+    text-align: center;
+    text-transform: uppercase;
+    width: 265px;
+    cursor: pointer;
+}
+
+h1 {
+    color: #d73c64;
+    text-align: center;
+}
+
+#section-kmt #kmt-fame {
+    border: medium none;
+    border-radius: 2px;
+    margin: 0 0 30px;
+    padding: 0;
+}
+
+.testimonial-footer {
+    padding: 2px 18px 30px 8px;
+}
+
+#section-kmt .avatar {
+    height: auto;
+    margin: 0;
+    width: 40px;
+}
+
+#section-kmt .kmt-author {
+    display: inline-block;
+    font-family: inherit;
+    font-size: inherit;
+    height: 20px;
+    line-height: 20px;
+    margin: 9px 0 0;
+    padding: 0 0 0 8px;
+    text-decoration: none !important;
+}
+
+#section-kmt .kmt-rank {
+    position: relative;
+    top: 41px;
+    width: 41px;
+}
+
+.testimonial-footer span.kmt-reply-wrap {
+    float: right;
+    margin-top: 10px;
+}
+
+#section-kmt .kmt-list > li + li > div, #section-kmt .kmt-list > .kmt-form + li > div {
+    border-top: medium none;
+}
+#section-kmt .kmt-list > li > div {
+    padding: 0;
+}
+
+.commentTools.kmt-comment-tools-wrap {
+    display: none;
+}
+
+.testimonial-header {
+    background-color: #eeeeee;
+    border: none;
+    padding: 20px;
+    position: relative;
+}
+
+.testimonial-header::after {
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 20px solid #fcfcfc;
+    bottom: -9px;
+    height: 0;
+    left: 20px;
+    position: absolute;
+    width: 0;
+    z-index: 99;
+    content: none;
+}
+
+.testimonial-footer{
+    background: #ffffff;
+}
+
+.testimonial-box {
+    border: medium none;
+    border-radius: 2px;
+    margin: 0;
+}
+
+.testimonial-header .testimonial-content {
+    border-left: 3px solid #ff6838;
+    color: inherit;
+    padding-left: 20px;
+}
+.kmt-btn-cancel2{
+    float: right;
+    margin-left: 20px;
+}
+
+.website-header {
+    margin: 2px 0 50px;
+    position: relative;
+}
+
+.logo-module {
+    float: left;
+    margin-top: 20px;
+}
+
+.social-links {
+    clear: both;
+    float: right;
+    margin: -90px 0 0;
+}
+
+@media (max-width: 530px) {
+    .social-links {
+        display: none !important;
+    }
+    .logo-module {
+        float: none;
+        margin-top: 20px;
+    }
+}
+
+@media (max-width: 767px) {
+    #ybox1 {
+        margin: 0 auto;
+    }
+}

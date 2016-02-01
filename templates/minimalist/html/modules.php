@@ -80,7 +80,7 @@ function modChrome_joomspirit($module, &$params, &$attribs) {
 				<div>
 					<?php if ($showtitle) : ?>
 					<div class="module-title">
-						<h3 class="module"><span class="<?php echo $params->get('header_class'); ?>" ><?php echo $module->title ; ?></span></h3>
+						<<?php echo $params->get('header_tag'); ?> class="module"><span class="<?php echo $params->get('header_class'); ?>" ><?php echo $module->title ; ?></span></<?php echo $params->get('header_tag'); ?>>
 					</div>
 					<?php endif; ?>
 			
@@ -134,7 +134,7 @@ function modChrome_joomspirit($module, &$params, &$attribs) {
 			?>
 			<div class="module <?php echo $suffix; ?>">
 				<?php if ($showtitle) : ?>
-				<h3 class="module"><span class="<?php echo $params->get('header_class'); ?>" ><?php echo $module->title ; ?></span></h3>
+				<<?php echo $params->get('header_tag'); ?> class="module"><span class="<?php echo $params->get('header_class'); ?>" ><?php echo $module->title ; ?></span></<?php echo $params->get('header_tag'); ?>>
 				<?php endif; ?>
 				<?php echo $content; ?>
 			</div>

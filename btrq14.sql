@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.5.1
+-- version 4.0.4.1
 -- http://www.phpmyadmin.net
 --
--- Client :  127.0.0.1
--- Généré le :  Lun 01 Février 2016 à 05:40
--- Version du serveur :  10.1.9-MariaDB
--- Version de PHP :  5.6.15
+-- Client: 127.0.0.1
+-- Généré le: Lun 01 Février 2016 à 14:48
+-- Version du serveur: 5.5.32
+-- Version de PHP: 5.4.16
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -14,11 +14,13 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
+/*!40101 SET NAMES utf8 */;
 
 --
--- Base de données :  `btrq14`
+-- Base de données: `btrq14`
 --
+CREATE DATABASE IF NOT EXISTS `btrq14` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE `btrq14`;
 
 -- --------------------------------------------------------
 
@@ -26,23 +28,27 @@ SET time_zone = "+00:00";
 -- Structure de la table `x8n17_assets`
 --
 
-CREATE TABLE `x8n17_assets` (
-  `id` int(10) UNSIGNED NOT NULL COMMENT 'Primary Key',
+CREATE TABLE IF NOT EXISTS `x8n17_assets` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
   `parent_id` int(11) NOT NULL DEFAULT '0' COMMENT 'Nested set parent.',
   `lft` int(11) NOT NULL DEFAULT '0' COMMENT 'Nested set lft.',
   `rgt` int(11) NOT NULL DEFAULT '0' COMMENT 'Nested set rgt.',
-  `level` int(10) UNSIGNED NOT NULL COMMENT 'The cached level in the nested tree.',
+  `level` int(10) unsigned NOT NULL COMMENT 'The cached level in the nested tree.',
   `name` varchar(50) NOT NULL COMMENT 'The unique name for the asset.\n',
   `title` varchar(100) NOT NULL COMMENT 'The descriptive title for the asset.',
-  `rules` varchar(5120) NOT NULL COMMENT 'JSON encoded access control.'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `rules` varchar(5120) NOT NULL COMMENT 'JSON encoded access control.',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_asset_name` (`name`),
+  KEY `idx_lft_rgt` (`lft`,`rgt`),
+  KEY `idx_parent_id` (`parent_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=109 ;
 
 --
 -- Contenu de la table `x8n17_assets`
 --
 
 INSERT INTO `x8n17_assets` (`id`, `parent_id`, `lft`, `rgt`, `level`, `name`, `title`, `rules`) VALUES
-(1, 0, 0, 133, 0, 'root.1', 'Root Asset', '{"core.login.site":{"6":1,"2":1},"core.login.admin":{"6":1},"core.login.offline":{"6":1},"core.admin":{"8":1},"core.manage":{"7":1},"core.create":{"6":1,"3":1},"core.delete":{"6":1},"core.edit":{"6":1,"4":1},"core.edit.state":{"6":1,"5":1},"core.edit.own":{"6":1,"3":1}}'),
+(1, 0, 0, 137, 0, 'root.1', 'Root Asset', '{"core.login.site":{"6":1,"2":1},"core.login.admin":{"6":1},"core.login.offline":{"6":1},"core.admin":{"8":1},"core.manage":{"7":1},"core.create":{"6":1,"3":1},"core.delete":{"6":1},"core.edit":{"6":1,"4":1},"core.edit.state":{"6":1,"5":1},"core.edit.own":{"6":1,"3":1}}'),
 (2, 1, 1, 2, 1, 'com_admin', 'com_admin', '{}'),
 (3, 1, 3, 6, 1, 'com_banners', 'com_banners', '{"core.admin":{"7":1},"core.manage":{"6":1},"core.create":[],"core.delete":[],"core.edit":[],"core.edit.state":[]}'),
 (4, 1, 7, 8, 1, 'com_cache', 'com_cache', '{"core.admin":{"7":1},"core.manage":{"7":1}}'),
@@ -108,7 +114,9 @@ INSERT INTO `x8n17_assets` (`id`, `parent_id`, `lft`, `rgt`, `level`, `name`, `t
 (71, 18, 92, 93, 2, 'com_modules.module.99', 'Ce qu''on fait', '{"core.delete":{"6":1},"core.edit":{"6":1,"4":1},"core.edit.state":{"6":1,"5":1},"module.edit.frontend":[]}'),
 (101, 18, 94, 95, 2, 'com_modules.module.100', 'Komento Activities', '{}'),
 (102, 18, 96, 97, 2, 'com_modules.module.101', 'Komento Comments', '{"core.delete":[],"core.edit":[],"core.edit.state":[],"module.edit.frontend":[]}'),
-(103, 1, 131, 132, 1, 'com_komento', 'com_komento', '{}');
+(103, 1, 131, 132, 1, 'com_komento', 'com_komento', '{}'),
+(104, 1, 133, 134, 1, 'com_jdeveloper', 'JDeveloper', '{}'),
+(108, 1, 135, 136, 1, 'com_rssfeed', 'com_rssfeed', '{}');
 
 -- --------------------------------------------------------
 
@@ -116,10 +124,12 @@ INSERT INTO `x8n17_assets` (`id`, `parent_id`, `lft`, `rgt`, `level`, `name`, `t
 -- Structure de la table `x8n17_associations`
 --
 
-CREATE TABLE `x8n17_associations` (
+CREATE TABLE IF NOT EXISTS `x8n17_associations` (
   `id` int(11) NOT NULL COMMENT 'A reference to the associated item.',
   `context` varchar(50) NOT NULL COMMENT 'The context of the associated item.',
-  `key` char(32) NOT NULL COMMENT 'The key for the association computed from an md5 on associated ids.'
+  `key` char(32) NOT NULL COMMENT 'The key for the association computed from an md5 on associated ids.',
+  PRIMARY KEY (`context`,`id`),
+  KEY `idx_key` (`key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -128,8 +138,8 @@ CREATE TABLE `x8n17_associations` (
 -- Structure de la table `x8n17_banners`
 --
 
-CREATE TABLE `x8n17_banners` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_banners` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `cid` int(11) NOT NULL DEFAULT '0',
   `type` int(11) NOT NULL DEFAULT '0',
   `name` varchar(255) NOT NULL DEFAULT '',
@@ -139,10 +149,10 @@ CREATE TABLE `x8n17_banners` (
   `clicks` int(11) NOT NULL DEFAULT '0',
   `clickurl` varchar(200) NOT NULL DEFAULT '',
   `state` tinyint(3) NOT NULL DEFAULT '0',
-  `catid` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `catid` int(10) unsigned NOT NULL DEFAULT '0',
   `description` text NOT NULL,
   `custombannercode` varchar(2048) NOT NULL,
-  `sticky` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+  `sticky` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `ordering` int(11) NOT NULL DEFAULT '0',
   `metakey` text NOT NULL,
   `params` text NOT NULL,
@@ -151,19 +161,25 @@ CREATE TABLE `x8n17_banners` (
   `purchase_type` tinyint(4) NOT NULL DEFAULT '-1',
   `track_clicks` tinyint(4) NOT NULL DEFAULT '-1',
   `track_impressions` tinyint(4) NOT NULL DEFAULT '-1',
-  `checked_out` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `checked_out` int(10) unsigned NOT NULL DEFAULT '0',
   `checked_out_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `publish_up` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `publish_down` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `reset` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `language` char(7) NOT NULL DEFAULT '',
-  `created_by` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `created_by` int(10) unsigned NOT NULL DEFAULT '0',
   `created_by_alias` varchar(255) NOT NULL DEFAULT '',
   `modified` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `modified_by` int(10) UNSIGNED NOT NULL DEFAULT '0',
-  `version` int(10) UNSIGNED NOT NULL DEFAULT '1'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `modified_by` int(10) unsigned NOT NULL DEFAULT '0',
+  `version` int(10) unsigned NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `idx_state` (`state`),
+  KEY `idx_own_prefix` (`own_prefix`),
+  KEY `idx_metakey_prefix` (`metakey_prefix`),
+  KEY `idx_banner_catid` (`catid`),
+  KEY `idx_language` (`language`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -171,22 +187,25 @@ CREATE TABLE `x8n17_banners` (
 -- Structure de la table `x8n17_banner_clients`
 --
 
-CREATE TABLE `x8n17_banner_clients` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_banner_clients` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL DEFAULT '',
   `contact` varchar(255) NOT NULL DEFAULT '',
   `email` varchar(255) NOT NULL DEFAULT '',
   `extrainfo` text NOT NULL,
   `state` tinyint(3) NOT NULL DEFAULT '0',
-  `checked_out` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `checked_out` int(10) unsigned NOT NULL DEFAULT '0',
   `checked_out_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `metakey` text NOT NULL,
   `own_prefix` tinyint(4) NOT NULL DEFAULT '0',
   `metakey_prefix` varchar(255) NOT NULL DEFAULT '',
   `purchase_type` tinyint(4) NOT NULL DEFAULT '-1',
   `track_clicks` tinyint(4) NOT NULL DEFAULT '-1',
-  `track_impressions` tinyint(4) NOT NULL DEFAULT '-1'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `track_impressions` tinyint(4) NOT NULL DEFAULT '-1',
+  PRIMARY KEY (`id`),
+  KEY `idx_own_prefix` (`own_prefix`),
+  KEY `idx_metakey_prefix` (`metakey_prefix`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -194,11 +213,15 @@ CREATE TABLE `x8n17_banner_clients` (
 -- Structure de la table `x8n17_banner_tracks`
 --
 
-CREATE TABLE `x8n17_banner_tracks` (
+CREATE TABLE IF NOT EXISTS `x8n17_banner_tracks` (
   `track_date` datetime NOT NULL,
-  `track_type` int(10) UNSIGNED NOT NULL,
-  `banner_id` int(10) UNSIGNED NOT NULL,
-  `count` int(10) UNSIGNED NOT NULL DEFAULT '0'
+  `track_type` int(10) unsigned NOT NULL,
+  `banner_id` int(10) unsigned NOT NULL,
+  `count` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`track_date`,`track_type`,`banner_id`),
+  KEY `idx_track_date` (`track_date`),
+  KEY `idx_track_type` (`track_type`),
+  KEY `idx_banner_id` (`banner_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -207,13 +230,13 @@ CREATE TABLE `x8n17_banner_tracks` (
 -- Structure de la table `x8n17_categories`
 --
 
-CREATE TABLE `x8n17_categories` (
-  `id` int(11) NOT NULL,
-  `asset_id` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'FK to the #__assets table.',
-  `parent_id` int(10) UNSIGNED NOT NULL DEFAULT '0',
+CREATE TABLE IF NOT EXISTS `x8n17_categories` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `asset_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'FK to the #__assets table.',
+  `parent_id` int(10) unsigned NOT NULL DEFAULT '0',
   `lft` int(11) NOT NULL DEFAULT '0',
   `rgt` int(11) NOT NULL DEFAULT '0',
-  `level` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `level` int(10) unsigned NOT NULL DEFAULT '0',
   `path` varchar(255) NOT NULL DEFAULT '',
   `extension` varchar(50) NOT NULL DEFAULT '',
   `title` varchar(255) NOT NULL,
@@ -221,28 +244,36 @@ CREATE TABLE `x8n17_categories` (
   `note` varchar(255) NOT NULL DEFAULT '',
   `description` mediumtext NOT NULL,
   `published` tinyint(1) NOT NULL DEFAULT '0',
-  `checked_out` int(11) UNSIGNED NOT NULL DEFAULT '0',
+  `checked_out` int(11) unsigned NOT NULL DEFAULT '0',
   `checked_out_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `access` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `access` int(10) unsigned NOT NULL DEFAULT '0',
   `params` text NOT NULL,
   `metadesc` varchar(1024) NOT NULL COMMENT 'The meta description for the page.',
   `metakey` varchar(1024) NOT NULL COMMENT 'The meta keywords for the page.',
   `metadata` varchar(2048) NOT NULL COMMENT 'JSON encoded metadata properties.',
-  `created_user_id` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `created_user_id` int(10) unsigned NOT NULL DEFAULT '0',
   `created_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `modified_user_id` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `modified_user_id` int(10) unsigned NOT NULL DEFAULT '0',
   `modified_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `hits` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `hits` int(10) unsigned NOT NULL DEFAULT '0',
   `language` char(7) NOT NULL,
-  `version` int(10) UNSIGNED NOT NULL DEFAULT '1'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `version` int(10) unsigned NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `cat_idx` (`extension`,`published`,`access`),
+  KEY `idx_access` (`access`),
+  KEY `idx_checkout` (`checked_out`),
+  KEY `idx_path` (`path`),
+  KEY `idx_left_right` (`lft`,`rgt`),
+  KEY `idx_alias` (`alias`),
+  KEY `idx_language` (`language`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=9 ;
 
 --
 -- Contenu de la table `x8n17_categories`
 --
 
 INSERT INTO `x8n17_categories` (`id`, `asset_id`, `parent_id`, `lft`, `rgt`, `level`, `path`, `extension`, `title`, `alias`, `note`, `description`, `published`, `checked_out`, `checked_out_time`, `access`, `params`, `metadesc`, `metakey`, `metadata`, `created_user_id`, `created_time`, `modified_user_id`, `modified_time`, `hits`, `language`, `version`) VALUES
-(1, 0, 0, 0, 15, 0, '', 'system', 'ROOT', 'root', '', '', 1, 0, '0000-00-00 00:00:00', 1, '{}', '', '', '{}', 192, '2011-01-01 00:00:01', 0, '0000-00-00 00:00:00', 0, '*', 1),
+(1, 0, 0, 0, 13, 0, '', 'system', 'ROOT', 'root', '', '', 1, 0, '0000-00-00 00:00:00', 1, '{}', '', '', '{}', 192, '2011-01-01 00:00:01', 0, '0000-00-00 00:00:00', 0, '*', 1),
 (2, 27, 1, 1, 2, 1, 'non-categorise', 'com_content', 'Non catégorisé', 'non-categorise', '', '', 1, 0, '0000-00-00 00:00:00', 1, '{"category_layout":"","image":""}', '', '', '{"author":"","robots":""}', 192, '2011-01-01 00:00:01', 0, '0000-00-00 00:00:00', 0, '*', 1),
 (3, 28, 1, 3, 4, 1, 'non-categorise', 'com_banners', 'Non catégorisé', 'non-categorise', '', '', 1, 0, '0000-00-00 00:00:00', 1, '{"category_layout":"","image":""}', '', '', '{"author":"","robots":""}', 192, '2011-01-01 00:00:01', 0, '0000-00-00 00:00:00', 0, '*', 1),
 (4, 29, 1, 5, 6, 1, 'non-categorise', 'com_contact', 'Non catégorisé', 'non-categorise', '', '', 1, 0, '0000-00-00 00:00:00', 1, '{"category_layout":"","image":""}', '', '', '{"author":"","robots":""}', 192, '2011-01-01 00:00:01', 0, '0000-00-00 00:00:00', 0, '*', 1),
@@ -255,8 +286,8 @@ INSERT INTO `x8n17_categories` (`id`, `asset_id`, `parent_id`, `lft`, `rgt`, `le
 -- Structure de la table `x8n17_contact_details`
 --
 
-CREATE TABLE `x8n17_contact_details` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_contact_details` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL DEFAULT '',
   `alias` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
   `con_position` varchar(255) DEFAULT NULL,
@@ -270,15 +301,15 @@ CREATE TABLE `x8n17_contact_details` (
   `misc` mediumtext,
   `image` varchar(255) DEFAULT NULL,
   `email_to` varchar(255) DEFAULT NULL,
-  `default_con` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+  `default_con` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `published` tinyint(1) NOT NULL DEFAULT '0',
-  `checked_out` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `checked_out` int(10) unsigned NOT NULL DEFAULT '0',
   `checked_out_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `ordering` int(11) NOT NULL DEFAULT '0',
   `params` text NOT NULL,
   `user_id` int(11) NOT NULL DEFAULT '0',
   `catid` int(11) NOT NULL DEFAULT '0',
-  `access` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `access` int(10) unsigned NOT NULL DEFAULT '0',
   `mobile` varchar(255) NOT NULL DEFAULT '',
   `webpage` varchar(255) NOT NULL DEFAULT '',
   `sortname1` varchar(255) NOT NULL,
@@ -286,20 +317,29 @@ CREATE TABLE `x8n17_contact_details` (
   `sortname3` varchar(255) NOT NULL,
   `language` char(7) NOT NULL,
   `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `created_by` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `created_by` int(10) unsigned NOT NULL DEFAULT '0',
   `created_by_alias` varchar(255) NOT NULL DEFAULT '',
   `modified` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `modified_by` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `modified_by` int(10) unsigned NOT NULL DEFAULT '0',
   `metakey` text NOT NULL,
   `metadesc` text NOT NULL,
   `metadata` text NOT NULL,
-  `featured` tinyint(3) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Set if article is featured.',
+  `featured` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT 'Set if article is featured.',
   `xreference` varchar(50) NOT NULL COMMENT 'A reference to enable linkages to external data sets.',
   `publish_up` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `publish_down` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `version` int(10) UNSIGNED NOT NULL DEFAULT '1',
-  `hits` int(10) UNSIGNED NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `version` int(10) unsigned NOT NULL DEFAULT '1',
+  `hits` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `idx_access` (`access`),
+  KEY `idx_checkout` (`checked_out`),
+  KEY `idx_state` (`published`),
+  KEY `idx_catid` (`catid`),
+  KEY `idx_createdby` (`created_by`),
+  KEY `idx_featured_catid` (`featured`,`catid`),
+  KEY `idx_language` (`language`),
+  KEY `idx_xreference` (`xreference`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -307,45 +347,54 @@ CREATE TABLE `x8n17_contact_details` (
 -- Structure de la table `x8n17_content`
 --
 
-CREATE TABLE `x8n17_content` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `asset_id` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'FK to the #__assets table.',
+CREATE TABLE IF NOT EXISTS `x8n17_content` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `asset_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'FK to the #__assets table.',
   `title` varchar(255) NOT NULL DEFAULT '',
   `alias` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
   `introtext` mediumtext NOT NULL,
   `fulltext` mediumtext NOT NULL,
   `state` tinyint(3) NOT NULL DEFAULT '0',
-  `catid` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `catid` int(10) unsigned NOT NULL DEFAULT '0',
   `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `created_by` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `created_by` int(10) unsigned NOT NULL DEFAULT '0',
   `created_by_alias` varchar(255) NOT NULL DEFAULT '',
   `modified` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `modified_by` int(10) UNSIGNED NOT NULL DEFAULT '0',
-  `checked_out` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `modified_by` int(10) unsigned NOT NULL DEFAULT '0',
+  `checked_out` int(10) unsigned NOT NULL DEFAULT '0',
   `checked_out_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `publish_up` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `publish_down` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `images` text NOT NULL,
   `urls` text NOT NULL,
   `attribs` varchar(5120) NOT NULL,
-  `version` int(10) UNSIGNED NOT NULL DEFAULT '1',
+  `version` int(10) unsigned NOT NULL DEFAULT '1',
   `ordering` int(11) NOT NULL DEFAULT '0',
   `metakey` text NOT NULL,
   `metadesc` text NOT NULL,
-  `access` int(10) UNSIGNED NOT NULL DEFAULT '0',
-  `hits` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `access` int(10) unsigned NOT NULL DEFAULT '0',
+  `hits` int(10) unsigned NOT NULL DEFAULT '0',
   `metadata` text NOT NULL,
-  `featured` tinyint(3) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Set if article is featured.',
+  `featured` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT 'Set if article is featured.',
   `language` char(7) NOT NULL COMMENT 'The language code for the article.',
-  `xreference` varchar(50) NOT NULL COMMENT 'A reference to enable linkages to external data sets.'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `xreference` varchar(50) NOT NULL COMMENT 'A reference to enable linkages to external data sets.',
+  PRIMARY KEY (`id`),
+  KEY `idx_access` (`access`),
+  KEY `idx_checkout` (`checked_out`),
+  KEY `idx_state` (`state`),
+  KEY `idx_catid` (`catid`),
+  KEY `idx_createdby` (`created_by`),
+  KEY `idx_featured_catid` (`featured`,`catid`),
+  KEY `idx_language` (`language`),
+  KEY `idx_xreference` (`xreference`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
 --
 -- Contenu de la table `x8n17_content`
 --
 
 INSERT INTO `x8n17_content` (`id`, `asset_id`, `title`, `alias`, `introtext`, `fulltext`, `state`, `catid`, `created`, `created_by`, `created_by_alias`, `modified`, `modified_by`, `checked_out`, `checked_out_time`, `publish_up`, `publish_down`, `images`, `urls`, `attribs`, `version`, `ordering`, `metakey`, `metadesc`, `access`, `hits`, `metadata`, `featured`, `language`, `xreference`) VALUES
-(1, 61, 'Etude de votre prêt immobilier', 'etude-de-votre-pret-immobilier', '<div class="bg-orange radius-8 bg-shadow-dark paypal_payer_button">Je commande par CB ou Paypal</div>', '', 1, 2, '2013-11-16 00:00:00', 192, '', '2016-01-30 20:51:50', 192, 0, '0000-00-00 00:00:00', '2013-11-16 00:00:00', '0000-00-00 00:00:00', '{"image_intro":"","float_intro":"","image_intro_alt":"","image_intro_caption":"","image_fulltext":"","float_fulltext":"","image_fulltext_alt":"","image_fulltext_caption":""}', '{"urla":false,"urlatext":"","targeta":"","urlb":false,"urlbtext":"","targetb":"","urlc":false,"urlctext":"","targetc":""}', '{"show_title":"","link_titles":"","show_tags":"","show_intro":"","info_block_position":"","show_category":"","link_category":"","show_parent_category":"","link_parent_category":"","show_author":"","link_author":"","show_create_date":"","show_modify_date":"","show_publish_date":"","show_item_navigation":"","show_icons":"","show_print_icon":"","show_email_icon":"","show_vote":"","show_hits":"","show_noauth":"","urls_position":"","alternative_readmore":"","article_layout":"","show_publishing_options":"","show_article_options":"","show_urls_images_backend":"","show_urls_images_frontend":""}', 6, 0, '', '', 1, 231, '{"robots":"","author":"","rights":"","xreference":""}', 0, '*', '');
+(1, 61, 'Etude de votre prêt immobilier', 'etude-de-votre-pret-immobilier', '<div class="bg-orange radius-8 bg-shadow-dark paypal_payer_button">Je commande par CB ou Paypal</div>', '', 1, 2, '2013-11-16 00:00:00', 192, '', '2016-01-30 20:51:50', 192, 0, '0000-00-00 00:00:00', '2013-11-16 00:00:00', '0000-00-00 00:00:00', '{"image_intro":"","float_intro":"","image_intro_alt":"","image_intro_caption":"","image_fulltext":"","float_fulltext":"","image_fulltext_alt":"","image_fulltext_caption":""}', '{"urla":false,"urlatext":"","targeta":"","urlb":false,"urlbtext":"","targetb":"","urlc":false,"urlctext":"","targetc":""}', '{"show_title":"","link_titles":"","show_tags":"","show_intro":"","info_block_position":"","show_category":"","link_category":"","show_parent_category":"","link_parent_category":"","show_author":"","link_author":"","show_create_date":"","show_modify_date":"","show_publish_date":"","show_item_navigation":"","show_icons":"","show_print_icon":"","show_email_icon":"","show_vote":"","show_hits":"","show_noauth":"","urls_position":"","alternative_readmore":"","article_layout":"","show_publishing_options":"","show_article_options":"","show_urls_images_backend":"","show_urls_images_frontend":""}', 6, 0, '', '', 1, 239, '{"robots":"","author":"","rights":"","xreference":""}', 0, '*', '');
 
 -- --------------------------------------------------------
 
@@ -353,13 +402,19 @@ INSERT INTO `x8n17_content` (`id`, `asset_id`, `title`, `alias`, `introtext`, `f
 -- Structure de la table `x8n17_contentitem_tag_map`
 --
 
-CREATE TABLE `x8n17_contentitem_tag_map` (
+CREATE TABLE IF NOT EXISTS `x8n17_contentitem_tag_map` (
   `type_alias` varchar(255) NOT NULL DEFAULT '',
-  `core_content_id` int(10) UNSIGNED NOT NULL COMMENT 'PK from the core content table',
+  `core_content_id` int(10) unsigned NOT NULL COMMENT 'PK from the core content table',
   `content_item_id` int(11) NOT NULL COMMENT 'PK from the content type table',
-  `tag_id` int(10) UNSIGNED NOT NULL COMMENT 'PK from the tag table',
+  `tag_id` int(10) unsigned NOT NULL COMMENT 'PK from the tag table',
   `tag_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Date of most recent save for this tag-item',
-  `type_id` mediumint(8) NOT NULL COMMENT 'PK from the content_type table'
+  `type_id` mediumint(8) NOT NULL COMMENT 'PK from the content_type table',
+  UNIQUE KEY `uc_ItemnameTagid` (`type_id`,`content_item_id`,`tag_id`),
+  KEY `idx_tag_type` (`tag_id`,`type_id`),
+  KEY `idx_date_id` (`tag_date`,`tag_id`),
+  KEY `idx_tag` (`tag_id`),
+  KEY `idx_type` (`type_id`),
+  KEY `idx_core_content_id` (`core_content_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Maps items from content tables to tags';
 
 --
@@ -375,9 +430,10 @@ INSERT INTO `x8n17_contentitem_tag_map` (`type_alias`, `core_content_id`, `conte
 -- Structure de la table `x8n17_content_frontpage`
 --
 
-CREATE TABLE `x8n17_content_frontpage` (
+CREATE TABLE IF NOT EXISTS `x8n17_content_frontpage` (
   `content_id` int(11) NOT NULL DEFAULT '0',
-  `ordering` int(11) NOT NULL DEFAULT '0'
+  `ordering` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`content_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -386,11 +442,12 @@ CREATE TABLE `x8n17_content_frontpage` (
 -- Structure de la table `x8n17_content_rating`
 --
 
-CREATE TABLE `x8n17_content_rating` (
+CREATE TABLE IF NOT EXISTS `x8n17_content_rating` (
   `content_id` int(11) NOT NULL DEFAULT '0',
-  `rating_sum` int(10) UNSIGNED NOT NULL DEFAULT '0',
-  `rating_count` int(10) UNSIGNED NOT NULL DEFAULT '0',
-  `lastip` varchar(50) NOT NULL DEFAULT ''
+  `rating_sum` int(10) unsigned NOT NULL DEFAULT '0',
+  `rating_count` int(10) unsigned NOT NULL DEFAULT '0',
+  `lastip` varchar(50) NOT NULL DEFAULT '',
+  PRIMARY KEY (`content_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -399,16 +456,18 @@ CREATE TABLE `x8n17_content_rating` (
 -- Structure de la table `x8n17_content_types`
 --
 
-CREATE TABLE `x8n17_content_types` (
-  `type_id` int(10) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_content_types` (
+  `type_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `type_title` varchar(255) NOT NULL DEFAULT '',
   `type_alias` varchar(255) NOT NULL DEFAULT '',
   `table` varchar(255) NOT NULL DEFAULT '',
   `rules` text NOT NULL,
   `field_mappings` text NOT NULL,
   `router` varchar(255) NOT NULL DEFAULT '',
-  `content_history_options` varchar(5120) DEFAULT NULL COMMENT 'JSON string for com_contenthistory options'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `content_history_options` varchar(5120) DEFAULT NULL COMMENT 'JSON string for com_contenthistory options',
+  PRIMARY KEY (`type_id`),
+  KEY `idx_alias` (`type_alias`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=14 ;
 
 --
 -- Contenu de la table `x8n17_content_types`
@@ -435,9 +494,9 @@ INSERT INTO `x8n17_content_types` (`type_id`, `type_title`, `type_alias`, `table
 -- Structure de la table `x8n17_core_log_searches`
 --
 
-CREATE TABLE `x8n17_core_log_searches` (
+CREATE TABLE IF NOT EXISTS `x8n17_core_log_searches` (
   `search_term` varchar(128) NOT NULL DEFAULT '',
-  `hits` int(10) UNSIGNED NOT NULL DEFAULT '0'
+  `hits` int(10) unsigned NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -446,25 +505,29 @@ CREATE TABLE `x8n17_core_log_searches` (
 -- Structure de la table `x8n17_extensions`
 --
 
-CREATE TABLE `x8n17_extensions` (
-  `extension_id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_extensions` (
+  `extension_id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `type` varchar(20) NOT NULL,
   `element` varchar(100) NOT NULL,
   `folder` varchar(100) NOT NULL,
   `client_id` tinyint(3) NOT NULL,
   `enabled` tinyint(3) NOT NULL DEFAULT '1',
-  `access` int(10) UNSIGNED NOT NULL DEFAULT '1',
+  `access` int(10) unsigned NOT NULL DEFAULT '1',
   `protected` tinyint(3) NOT NULL DEFAULT '0',
   `manifest_cache` text NOT NULL,
   `params` text NOT NULL,
   `custom_data` text NOT NULL,
   `system_data` text NOT NULL,
-  `checked_out` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `checked_out` int(10) unsigned NOT NULL DEFAULT '0',
   `checked_out_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `ordering` int(11) DEFAULT '0',
-  `state` int(11) DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `state` int(11) DEFAULT '0',
+  PRIMARY KEY (`extension_id`),
+  KEY `element_clientid` (`element`,`client_id`),
+  KEY `element_folder_clientid` (`element`,`folder`,`client_id`),
+  KEY `extension` (`type`,`element`,`folder`,`client_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=10028 ;
 
 --
 -- Contenu de la table `x8n17_extensions`
@@ -503,7 +566,7 @@ INSERT INTO `x8n17_extensions` (`extension_id`, `name`, `type`, `element`, `fold
 (32, 'com_postinstall', 'component', 'com_postinstall', '', 1, 1, 1, 1, '{"name":"com_postinstall","type":"component","creationDate":"September 2013","author":"Joomla! Project","copyright":"(C) 2005 - 2015 Open Source Matters. All rights reserved.","authorEmail":"admin@joomla.org","authorUrl":"www.joomla.org","version":"3.2.0","description":"COM_POSTINSTALL_XML_DESCRIPTION","group":""}', '', '', '', 0, '0000-00-00 00:00:00', 0, 0),
 (101, 'SimplePie', 'library', 'simplepie', '', 0, 1, 1, 1, '{"name":"SimplePie","type":"library","creationDate":"2004","author":"SimplePie","copyright":"Copyright (c) 2004-2009, Ryan Parman and Geoffrey Sneddon","authorEmail":"","authorUrl":"http:\\/\\/simplepie.org\\/","version":"1.2","description":"LIB_SIMPLEPIE_XML_DESCRIPTION","group":"","filename":"simplepie"}', '', '', '', 0, '0000-00-00 00:00:00', 0, 0),
 (102, 'phputf8', 'library', 'phputf8', '', 0, 1, 1, 1, '{"name":"phputf8","type":"library","creationDate":"2006","author":"Harry Fuecks","copyright":"Copyright various authors","authorEmail":"hfuecks@gmail.com","authorUrl":"http:\\/\\/sourceforge.net\\/projects\\/phputf8","version":"0.5","description":"LIB_PHPUTF8_XML_DESCRIPTION","group":"","filename":"phputf8"}', '', '', '', 0, '0000-00-00 00:00:00', 0, 0),
-(103, 'Joomla! Platform', 'library', 'joomla', '', 0, 1, 1, 1, '{"name":"Joomla! Platform","type":"library","creationDate":"2008","author":"Joomla! Project","copyright":"Copyright (C) 2005 - 2015 Open Source Matters. All rights reserved.","authorEmail":"admin@joomla.org","authorUrl":"http:\\/\\/www.joomla.org","version":"13.1","description":"LIB_JOOMLA_XML_DESCRIPTION","group":"","filename":"joomla"}', '{"mediaversion":"677c1d5357af05f48d04b7978fa1432e"}', '', '', 0, '0000-00-00 00:00:00', 0, 0),
+(103, 'Joomla! Platform', 'library', 'joomla', '', 0, 1, 1, 1, '{"name":"Joomla! Platform","type":"library","creationDate":"2008","author":"Joomla! Project","copyright":"Copyright (C) 2005 - 2015 Open Source Matters. All rights reserved.","authorEmail":"admin@joomla.org","authorUrl":"http:\\/\\/www.joomla.org","version":"13.1","description":"LIB_JOOMLA_XML_DESCRIPTION","group":"","filename":"joomla"}', '{"mediaversion":"bc48eaad25e63ecb2668b53c6440e6cf"}', '', '', 0, '0000-00-00 00:00:00', 0, 0),
 (104, 'IDNA Convert', 'library', 'idna_convert', '', 0, 1, 1, 1, '{"name":"IDNA Convert","type":"library","creationDate":"2004","author":"phlyLabs","copyright":"2004-2011 phlyLabs Berlin, http:\\/\\/phlylabs.de","authorEmail":"phlymail@phlylabs.de","authorUrl":"http:\\/\\/phlylabs.de","version":"0.8.0","description":"LIB_IDNA_XML_DESCRIPTION","group":"","filename":"idna_convert"}', '', '', '', 0, '0000-00-00 00:00:00', 0, 0),
 (105, 'FOF', 'library', 'fof', '', 0, 1, 1, 1, '{"name":"FOF","type":"library","creationDate":"2015-04-22 13:15:32","author":"Nicholas K. Dionysopoulos \\/ Akeeba Ltd","copyright":"(C)2011-2015 Nicholas K. Dionysopoulos","authorEmail":"nicholas@akeebabackup.com","authorUrl":"https:\\/\\/www.akeebabackup.com","version":"2.4.3","description":"LIB_FOF_XML_DESCRIPTION","group":"","filename":"fof"}', '', '', '', 0, '0000-00-00 00:00:00', 0, 0),
 (106, 'PHPass', 'library', 'phpass', '', 0, 1, 1, 1, '{"name":"PHPass","type":"library","creationDate":"2004-2006","author":"Solar Designer","copyright":"","authorEmail":"solar@openwall.com","authorUrl":"http:\\/\\/www.openwall.com\\/phpass\\/","version":"0.3","description":"LIB_PHPASS_XML_DESCRIPTION","group":"","filename":"phpass"}', '', '', '', 0, '0000-00-00 00:00:00', 0, 0),
@@ -619,7 +682,29 @@ INSERT INTO `x8n17_extensions` (`extension_id`, `name`, `type`, `element`, `fold
 (10017, 'System - Komento', 'plugin', 'komento', 'system', 0, 1, 1, 0, '{"name":"System - Komento","type":"plugin","creationDate":"07\\/01\\/2012","author":"StackIdeas","copyright":"Copyright (C) 2012 StackIdeas. All rights reserved.","authorEmail":"support@stackideas.com","authorUrl":"http:\\/\\/www.stackideas.com","version":"1.0","description":"This plugin adds a discussion\\/comment interface at the bottom of the article","group":"","filename":"komento"}', '{}', '', '', 0, '0000-00-00 00:00:00', 0, 0),
 (10018, 'User - Komento Users', 'plugin', 'komentousers', 'user', 0, 1, 1, 0, '{"name":"User - Komento Users","type":"plugin","creationDate":"February 2012","author":"StackIdeas","copyright":"Copyright 2012 StackIdeas. All rights reserved.","authorEmail":"support@stackideas.com","authorUrl":"http:\\/\\/www.stackideas.com","version":"1.0.0","description":"Komento user plugin. This plugin is responsible to delete user''s related records.","group":"","filename":"komentousers"}', '{}', '', '', 0, '0000-00-00 00:00:00', 0, 0),
 (10019, 'Komento Activities', 'module', 'mod_komento_activities', '', 0, 1, 0, 0, '{"name":"Komento Activities","type":"module","creationDate":"May 2012","author":"StackIdeas","copyright":"Copyright 2009 - 2012 Stack Ideas. All rights reserved.","authorEmail":"support@stackideas.com","authorUrl":"http:\\/\\/www.stackideas.com","version":"1.0.4","description":"Display activities from Komento","group":"","filename":"mod_komento_activities"}', '{"limit":"5","component":"all","includelikes":"1","includecomments":"1","includereplies":"1","showcomment":"1","maxcommentlength":"100","maxtitlelength":"30","cache":"0"}', '', '', 0, '0000-00-00 00:00:00', 0, 0),
-(10020, 'Komento Comments', 'module', 'mod_komento_comments', '', 0, 1, 0, 0, '{"name":"Komento Comments","type":"module","creationDate":"May 2012","author":"StackIdeas","copyright":"Copyright 2009 - 2012 Stack Ideas. All rights reserved.","authorEmail":"support@stackideas.com","authorUrl":"http:\\/\\/www.stackideas.com","version":"1.0.7","description":"Display comments from Komento","group":"","filename":"mod_komento_comments"}', '{"limit":"5","component":"all","filter":"all","category":"","articleId":"","userId":"","sort":"latest","random":"0","filtersticked":"0","showtitle":"1","showcomponent":"1","showavatar":"1","showauthor":"1","maxcommentlength":"100","maxtitlelength":"30","cache":"0"}', '', '', 0, '0000-00-00 00:00:00', 0, 0);
+(10020, 'Komento Comments', 'module', 'mod_komento_comments', '', 0, 1, 0, 0, '{"name":"Komento Comments","type":"module","creationDate":"May 2012","author":"StackIdeas","copyright":"Copyright 2009 - 2012 Stack Ideas. All rights reserved.","authorEmail":"support@stackideas.com","authorUrl":"http:\\/\\/www.stackideas.com","version":"1.0.7","description":"Display comments from Komento","group":"","filename":"mod_komento_comments"}', '{"limit":"5","component":"all","filter":"all","category":"","articleId":"","userId":"","sort":"latest","random":"0","filtersticked":"0","showtitle":"1","showcomponent":"1","showavatar":"1","showauthor":"1","maxcommentlength":"100","maxtitlelength":"30","cache":"0"}', '', '', 0, '0000-00-00 00:00:00', 0, 0),
+(10021, 'VirtueMart_Plugins_Language_Pack - fr-FR', 'file', 'VirtueMart_Plugins_Language_Pack-fr-FR', '', 0, 1, 0, 0, '{"name":"VirtueMart_Plugins_Language_Pack - fr-FR","type":"file","creationDate":"24.11.2015","author":"VirtueMart language team","copyright":"\\u00a9 2008-2015 - compojoom-com. All rights reserved!","authorEmail":"max@virtuemart.net","authorUrl":"https:\\/\\/virtuemart.net","version":"2015-11-24-05-17-38","description":"\\n        This package was auto generated with CTransifex(https:\\/\\/compojoom.com). We''ve grabbed the latest language files for our extension from transifex.com.\\n        Special thanks to our translation team at (https:\\/\\/www.transifex.com\\/projects\\/p\\/virtuemart\\/) for helping with this VirtueMart translation!\\n    ","group":""}', '', '', '', 0, '0000-00-00 00:00:00', 0, 0),
+(10022, 'JDeveloper', 'component', 'com_jdeveloper', '', 1, 1, 0, 0, '{"name":"JDeveloper","type":"component","creationDate":"May 2014","author":"Tilo-Lars Flasche","copyright":"Tilo-Lars Flasche","authorEmail":"jcms.development@gmail.com","authorUrl":"www.joommaster.bplaced.org","version":"3.10.2.1","description":"COM_JDEVELOPER_XML_DESCRIPTION","group":""}', '{}', '', '', 0, '0000-00-00 00:00:00', 0, 0),
+(10023, 'JCMS Library', 'library', 'jcms', '', 0, 1, 1, 0, '{"name":"JCMS Library","type":"library","creationDate":"May 2014","author":"Tilo-Lars Flasche","copyright":"Tilo-Lars Flasche","authorEmail":"jcms.development@gmail.com","authorUrl":"www.joommaster.bplaced.org","version":"3.0.1","description":"LIB_JCMS_XML_DESCRIPTION","group":"","filename":"jcms"}', '{}', '', '', 0, '0000-00-00 00:00:00', 0, 0),
+(10024, 'jdeveloper', 'package', 'pkg_jdeveloper', '', 0, 1, 1, 0, '{"name":"jdeveloper","type":"package","creationDate":"Jul 2015","author":"Unknown","copyright":"Copyright (C) 2014, Tilo-Lars Flasche. All rights reserved.","authorEmail":"","authorUrl":"","version":"3.10.2.1","description":"JDeveloper","group":"","filename":"pkg_jdeveloper"}', '{}', '', '', 0, '0000-00-00 00:00:00', 0, 0),
+(10027, 'com_rssfeed', 'component', 'com_rssfeed', '', 1, 1, 0, 0, '{"name":"com_rssfeed","type":"component","creationDate":"2016 february 01","author":"Unknown","copyright":"","authorEmail":"","authorUrl":"","version":"1.0.0","description":"COM_RSSFEED_XML_DESCRIPTION","group":""}', '{}', '', '', 0, '0000-00-00 00:00:00', 0, 0);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `x8n17_feed`
+--
+
+CREATE TABLE IF NOT EXISTS `x8n17_feed` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `catid` int(11) unsigned NOT NULL DEFAULT '0',
+  `alias` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
+  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created_by` int(11) unsigned NOT NULL DEFAULT '0',
+  `publish_up` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `publish_down` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -627,22 +712,23 @@ INSERT INTO `x8n17_extensions` (`extension_id`, `name`, `type`, `element`, `fold
 -- Structure de la table `x8n17_finder_filters`
 --
 
-CREATE TABLE `x8n17_finder_filters` (
-  `filter_id` int(10) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_finder_filters` (
+  `filter_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
   `alias` varchar(255) NOT NULL,
   `state` tinyint(1) NOT NULL DEFAULT '1',
   `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `created_by` int(10) UNSIGNED NOT NULL,
+  `created_by` int(10) unsigned NOT NULL,
   `created_by_alias` varchar(255) NOT NULL,
   `modified` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `modified_by` int(10) UNSIGNED NOT NULL DEFAULT '0',
-  `checked_out` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `modified_by` int(10) unsigned NOT NULL DEFAULT '0',
+  `checked_out` int(10) unsigned NOT NULL DEFAULT '0',
   `checked_out_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `map_count` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `map_count` int(10) unsigned NOT NULL DEFAULT '0',
   `data` text NOT NULL,
-  `params` mediumtext
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `params` mediumtext,
+  PRIMARY KEY (`filter_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -650,8 +736,8 @@ CREATE TABLE `x8n17_finder_filters` (
 -- Structure de la table `x8n17_finder_links`
 --
 
-CREATE TABLE `x8n17_finder_links` (
-  `link_id` int(10) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_finder_links` (
+  `link_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `url` varchar(255) NOT NULL,
   `route` varchar(255) NOT NULL,
   `title` varchar(255) DEFAULT NULL,
@@ -666,11 +752,18 @@ CREATE TABLE `x8n17_finder_links` (
   `publish_end_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `start_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `end_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `list_price` double UNSIGNED NOT NULL DEFAULT '0',
-  `sale_price` double UNSIGNED NOT NULL DEFAULT '0',
+  `list_price` double unsigned NOT NULL DEFAULT '0',
+  `sale_price` double unsigned NOT NULL DEFAULT '0',
   `type_id` int(11) NOT NULL,
-  `object` mediumblob NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `object` mediumblob NOT NULL,
+  PRIMARY KEY (`link_id`),
+  KEY `idx_type` (`type_id`),
+  KEY `idx_title` (`title`),
+  KEY `idx_md5` (`md5sum`),
+  KEY `idx_url` (`url`(75)),
+  KEY `idx_published_list` (`published`,`state`,`access`,`publish_start_date`,`publish_end_date`,`list_price`),
+  KEY `idx_published_sale` (`published`,`state`,`access`,`publish_start_date`,`publish_end_date`,`sale_price`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -678,10 +771,13 @@ CREATE TABLE `x8n17_finder_links` (
 -- Structure de la table `x8n17_finder_links_terms0`
 --
 
-CREATE TABLE `x8n17_finder_links_terms0` (
-  `link_id` int(10) UNSIGNED NOT NULL,
-  `term_id` int(10) UNSIGNED NOT NULL,
-  `weight` float UNSIGNED NOT NULL
+CREATE TABLE IF NOT EXISTS `x8n17_finder_links_terms0` (
+  `link_id` int(10) unsigned NOT NULL,
+  `term_id` int(10) unsigned NOT NULL,
+  `weight` float unsigned NOT NULL,
+  PRIMARY KEY (`link_id`,`term_id`),
+  KEY `idx_term_weight` (`term_id`,`weight`),
+  KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -690,10 +786,13 @@ CREATE TABLE `x8n17_finder_links_terms0` (
 -- Structure de la table `x8n17_finder_links_terms1`
 --
 
-CREATE TABLE `x8n17_finder_links_terms1` (
-  `link_id` int(10) UNSIGNED NOT NULL,
-  `term_id` int(10) UNSIGNED NOT NULL,
-  `weight` float UNSIGNED NOT NULL
+CREATE TABLE IF NOT EXISTS `x8n17_finder_links_terms1` (
+  `link_id` int(10) unsigned NOT NULL,
+  `term_id` int(10) unsigned NOT NULL,
+  `weight` float unsigned NOT NULL,
+  PRIMARY KEY (`link_id`,`term_id`),
+  KEY `idx_term_weight` (`term_id`,`weight`),
+  KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -702,10 +801,13 @@ CREATE TABLE `x8n17_finder_links_terms1` (
 -- Structure de la table `x8n17_finder_links_terms2`
 --
 
-CREATE TABLE `x8n17_finder_links_terms2` (
-  `link_id` int(10) UNSIGNED NOT NULL,
-  `term_id` int(10) UNSIGNED NOT NULL,
-  `weight` float UNSIGNED NOT NULL
+CREATE TABLE IF NOT EXISTS `x8n17_finder_links_terms2` (
+  `link_id` int(10) unsigned NOT NULL,
+  `term_id` int(10) unsigned NOT NULL,
+  `weight` float unsigned NOT NULL,
+  PRIMARY KEY (`link_id`,`term_id`),
+  KEY `idx_term_weight` (`term_id`,`weight`),
+  KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -714,10 +816,13 @@ CREATE TABLE `x8n17_finder_links_terms2` (
 -- Structure de la table `x8n17_finder_links_terms3`
 --
 
-CREATE TABLE `x8n17_finder_links_terms3` (
-  `link_id` int(10) UNSIGNED NOT NULL,
-  `term_id` int(10) UNSIGNED NOT NULL,
-  `weight` float UNSIGNED NOT NULL
+CREATE TABLE IF NOT EXISTS `x8n17_finder_links_terms3` (
+  `link_id` int(10) unsigned NOT NULL,
+  `term_id` int(10) unsigned NOT NULL,
+  `weight` float unsigned NOT NULL,
+  PRIMARY KEY (`link_id`,`term_id`),
+  KEY `idx_term_weight` (`term_id`,`weight`),
+  KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -726,10 +831,13 @@ CREATE TABLE `x8n17_finder_links_terms3` (
 -- Structure de la table `x8n17_finder_links_terms4`
 --
 
-CREATE TABLE `x8n17_finder_links_terms4` (
-  `link_id` int(10) UNSIGNED NOT NULL,
-  `term_id` int(10) UNSIGNED NOT NULL,
-  `weight` float UNSIGNED NOT NULL
+CREATE TABLE IF NOT EXISTS `x8n17_finder_links_terms4` (
+  `link_id` int(10) unsigned NOT NULL,
+  `term_id` int(10) unsigned NOT NULL,
+  `weight` float unsigned NOT NULL,
+  PRIMARY KEY (`link_id`,`term_id`),
+  KEY `idx_term_weight` (`term_id`,`weight`),
+  KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -738,10 +846,13 @@ CREATE TABLE `x8n17_finder_links_terms4` (
 -- Structure de la table `x8n17_finder_links_terms5`
 --
 
-CREATE TABLE `x8n17_finder_links_terms5` (
-  `link_id` int(10) UNSIGNED NOT NULL,
-  `term_id` int(10) UNSIGNED NOT NULL,
-  `weight` float UNSIGNED NOT NULL
+CREATE TABLE IF NOT EXISTS `x8n17_finder_links_terms5` (
+  `link_id` int(10) unsigned NOT NULL,
+  `term_id` int(10) unsigned NOT NULL,
+  `weight` float unsigned NOT NULL,
+  PRIMARY KEY (`link_id`,`term_id`),
+  KEY `idx_term_weight` (`term_id`,`weight`),
+  KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -750,10 +861,13 @@ CREATE TABLE `x8n17_finder_links_terms5` (
 -- Structure de la table `x8n17_finder_links_terms6`
 --
 
-CREATE TABLE `x8n17_finder_links_terms6` (
-  `link_id` int(10) UNSIGNED NOT NULL,
-  `term_id` int(10) UNSIGNED NOT NULL,
-  `weight` float UNSIGNED NOT NULL
+CREATE TABLE IF NOT EXISTS `x8n17_finder_links_terms6` (
+  `link_id` int(10) unsigned NOT NULL,
+  `term_id` int(10) unsigned NOT NULL,
+  `weight` float unsigned NOT NULL,
+  PRIMARY KEY (`link_id`,`term_id`),
+  KEY `idx_term_weight` (`term_id`,`weight`),
+  KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -762,10 +876,13 @@ CREATE TABLE `x8n17_finder_links_terms6` (
 -- Structure de la table `x8n17_finder_links_terms7`
 --
 
-CREATE TABLE `x8n17_finder_links_terms7` (
-  `link_id` int(10) UNSIGNED NOT NULL,
-  `term_id` int(10) UNSIGNED NOT NULL,
-  `weight` float UNSIGNED NOT NULL
+CREATE TABLE IF NOT EXISTS `x8n17_finder_links_terms7` (
+  `link_id` int(10) unsigned NOT NULL,
+  `term_id` int(10) unsigned NOT NULL,
+  `weight` float unsigned NOT NULL,
+  PRIMARY KEY (`link_id`,`term_id`),
+  KEY `idx_term_weight` (`term_id`,`weight`),
+  KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -774,10 +891,13 @@ CREATE TABLE `x8n17_finder_links_terms7` (
 -- Structure de la table `x8n17_finder_links_terms8`
 --
 
-CREATE TABLE `x8n17_finder_links_terms8` (
-  `link_id` int(10) UNSIGNED NOT NULL,
-  `term_id` int(10) UNSIGNED NOT NULL,
-  `weight` float UNSIGNED NOT NULL
+CREATE TABLE IF NOT EXISTS `x8n17_finder_links_terms8` (
+  `link_id` int(10) unsigned NOT NULL,
+  `term_id` int(10) unsigned NOT NULL,
+  `weight` float unsigned NOT NULL,
+  PRIMARY KEY (`link_id`,`term_id`),
+  KEY `idx_term_weight` (`term_id`,`weight`),
+  KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -786,10 +906,13 @@ CREATE TABLE `x8n17_finder_links_terms8` (
 -- Structure de la table `x8n17_finder_links_terms9`
 --
 
-CREATE TABLE `x8n17_finder_links_terms9` (
-  `link_id` int(10) UNSIGNED NOT NULL,
-  `term_id` int(10) UNSIGNED NOT NULL,
-  `weight` float UNSIGNED NOT NULL
+CREATE TABLE IF NOT EXISTS `x8n17_finder_links_terms9` (
+  `link_id` int(10) unsigned NOT NULL,
+  `term_id` int(10) unsigned NOT NULL,
+  `weight` float unsigned NOT NULL,
+  PRIMARY KEY (`link_id`,`term_id`),
+  KEY `idx_term_weight` (`term_id`,`weight`),
+  KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -798,10 +921,13 @@ CREATE TABLE `x8n17_finder_links_terms9` (
 -- Structure de la table `x8n17_finder_links_termsa`
 --
 
-CREATE TABLE `x8n17_finder_links_termsa` (
-  `link_id` int(10) UNSIGNED NOT NULL,
-  `term_id` int(10) UNSIGNED NOT NULL,
-  `weight` float UNSIGNED NOT NULL
+CREATE TABLE IF NOT EXISTS `x8n17_finder_links_termsa` (
+  `link_id` int(10) unsigned NOT NULL,
+  `term_id` int(10) unsigned NOT NULL,
+  `weight` float unsigned NOT NULL,
+  PRIMARY KEY (`link_id`,`term_id`),
+  KEY `idx_term_weight` (`term_id`,`weight`),
+  KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -810,10 +936,13 @@ CREATE TABLE `x8n17_finder_links_termsa` (
 -- Structure de la table `x8n17_finder_links_termsb`
 --
 
-CREATE TABLE `x8n17_finder_links_termsb` (
-  `link_id` int(10) UNSIGNED NOT NULL,
-  `term_id` int(10) UNSIGNED NOT NULL,
-  `weight` float UNSIGNED NOT NULL
+CREATE TABLE IF NOT EXISTS `x8n17_finder_links_termsb` (
+  `link_id` int(10) unsigned NOT NULL,
+  `term_id` int(10) unsigned NOT NULL,
+  `weight` float unsigned NOT NULL,
+  PRIMARY KEY (`link_id`,`term_id`),
+  KEY `idx_term_weight` (`term_id`,`weight`),
+  KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -822,10 +951,13 @@ CREATE TABLE `x8n17_finder_links_termsb` (
 -- Structure de la table `x8n17_finder_links_termsc`
 --
 
-CREATE TABLE `x8n17_finder_links_termsc` (
-  `link_id` int(10) UNSIGNED NOT NULL,
-  `term_id` int(10) UNSIGNED NOT NULL,
-  `weight` float UNSIGNED NOT NULL
+CREATE TABLE IF NOT EXISTS `x8n17_finder_links_termsc` (
+  `link_id` int(10) unsigned NOT NULL,
+  `term_id` int(10) unsigned NOT NULL,
+  `weight` float unsigned NOT NULL,
+  PRIMARY KEY (`link_id`,`term_id`),
+  KEY `idx_term_weight` (`term_id`,`weight`),
+  KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -834,10 +966,13 @@ CREATE TABLE `x8n17_finder_links_termsc` (
 -- Structure de la table `x8n17_finder_links_termsd`
 --
 
-CREATE TABLE `x8n17_finder_links_termsd` (
-  `link_id` int(10) UNSIGNED NOT NULL,
-  `term_id` int(10) UNSIGNED NOT NULL,
-  `weight` float UNSIGNED NOT NULL
+CREATE TABLE IF NOT EXISTS `x8n17_finder_links_termsd` (
+  `link_id` int(10) unsigned NOT NULL,
+  `term_id` int(10) unsigned NOT NULL,
+  `weight` float unsigned NOT NULL,
+  PRIMARY KEY (`link_id`,`term_id`),
+  KEY `idx_term_weight` (`term_id`,`weight`),
+  KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -846,10 +981,13 @@ CREATE TABLE `x8n17_finder_links_termsd` (
 -- Structure de la table `x8n17_finder_links_termse`
 --
 
-CREATE TABLE `x8n17_finder_links_termse` (
-  `link_id` int(10) UNSIGNED NOT NULL,
-  `term_id` int(10) UNSIGNED NOT NULL,
-  `weight` float UNSIGNED NOT NULL
+CREATE TABLE IF NOT EXISTS `x8n17_finder_links_termse` (
+  `link_id` int(10) unsigned NOT NULL,
+  `term_id` int(10) unsigned NOT NULL,
+  `weight` float unsigned NOT NULL,
+  PRIMARY KEY (`link_id`,`term_id`),
+  KEY `idx_term_weight` (`term_id`,`weight`),
+  KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -858,10 +996,13 @@ CREATE TABLE `x8n17_finder_links_termse` (
 -- Structure de la table `x8n17_finder_links_termsf`
 --
 
-CREATE TABLE `x8n17_finder_links_termsf` (
-  `link_id` int(10) UNSIGNED NOT NULL,
-  `term_id` int(10) UNSIGNED NOT NULL,
-  `weight` float UNSIGNED NOT NULL
+CREATE TABLE IF NOT EXISTS `x8n17_finder_links_termsf` (
+  `link_id` int(10) unsigned NOT NULL,
+  `term_id` int(10) unsigned NOT NULL,
+  `weight` float unsigned NOT NULL,
+  PRIMARY KEY (`link_id`,`term_id`),
+  KEY `idx_term_weight` (`term_id`,`weight`),
+  KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -870,14 +1011,20 @@ CREATE TABLE `x8n17_finder_links_termsf` (
 -- Structure de la table `x8n17_finder_taxonomy`
 --
 
-CREATE TABLE `x8n17_finder_taxonomy` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `parent_id` int(10) UNSIGNED NOT NULL DEFAULT '0',
+CREATE TABLE IF NOT EXISTS `x8n17_finder_taxonomy` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `parent_id` int(10) unsigned NOT NULL DEFAULT '0',
   `title` varchar(255) NOT NULL,
-  `state` tinyint(1) UNSIGNED NOT NULL DEFAULT '1',
-  `access` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
-  `ordering` tinyint(1) UNSIGNED NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `state` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `access` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `ordering` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `parent_id` (`parent_id`),
+  KEY `state` (`state`),
+  KEY `ordering` (`ordering`),
+  KEY `access` (`access`),
+  KEY `idx_parent_published` (`parent_id`,`state`,`access`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
 --
 -- Contenu de la table `x8n17_finder_taxonomy`
@@ -892,9 +1039,12 @@ INSERT INTO `x8n17_finder_taxonomy` (`id`, `parent_id`, `title`, `state`, `acces
 -- Structure de la table `x8n17_finder_taxonomy_map`
 --
 
-CREATE TABLE `x8n17_finder_taxonomy_map` (
-  `link_id` int(10) UNSIGNED NOT NULL,
-  `node_id` int(10) UNSIGNED NOT NULL
+CREATE TABLE IF NOT EXISTS `x8n17_finder_taxonomy_map` (
+  `link_id` int(10) unsigned NOT NULL,
+  `node_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`link_id`,`node_id`),
+  KEY `link_id` (`link_id`),
+  KEY `node_id` (`node_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -903,17 +1053,22 @@ CREATE TABLE `x8n17_finder_taxonomy_map` (
 -- Structure de la table `x8n17_finder_terms`
 --
 
-CREATE TABLE `x8n17_finder_terms` (
-  `term_id` int(10) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_finder_terms` (
+  `term_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `term` varchar(75) NOT NULL,
   `stem` varchar(75) NOT NULL,
-  `common` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
-  `phrase` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
-  `weight` float UNSIGNED NOT NULL DEFAULT '0',
+  `common` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `phrase` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `weight` float unsigned NOT NULL DEFAULT '0',
   `soundex` varchar(75) NOT NULL,
   `links` int(10) NOT NULL DEFAULT '0',
-  `language` char(3) NOT NULL DEFAULT ''
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `language` char(3) NOT NULL DEFAULT '',
+  PRIMARY KEY (`term_id`),
+  UNIQUE KEY `idx_term` (`term`),
+  KEY `idx_term_phrase` (`term`,`phrase`),
+  KEY `idx_stem_phrase` (`stem`,`phrase`),
+  KEY `idx_soundex_phrase` (`soundex`,`phrase`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -921,9 +1076,11 @@ CREATE TABLE `x8n17_finder_terms` (
 -- Structure de la table `x8n17_finder_terms_common`
 --
 
-CREATE TABLE `x8n17_finder_terms_common` (
+CREATE TABLE IF NOT EXISTS `x8n17_finder_terms_common` (
   `term` varchar(75) NOT NULL,
-  `language` varchar(3) NOT NULL
+  `language` varchar(3) NOT NULL,
+  KEY `idx_word_lang` (`term`,`language`),
+  KEY `idx_lang` (`language`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1153,14 +1310,16 @@ INSERT INTO `x8n17_finder_terms_common` (`term`, `language`) VALUES
 -- Structure de la table `x8n17_finder_tokens`
 --
 
-CREATE TABLE `x8n17_finder_tokens` (
+CREATE TABLE IF NOT EXISTS `x8n17_finder_tokens` (
   `term` varchar(75) NOT NULL,
   `stem` varchar(75) NOT NULL,
-  `common` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
-  `phrase` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
-  `weight` float UNSIGNED NOT NULL DEFAULT '1',
-  `context` tinyint(1) UNSIGNED NOT NULL DEFAULT '2',
-  `language` char(3) NOT NULL DEFAULT ''
+  `common` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `phrase` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `weight` float unsigned NOT NULL DEFAULT '1',
+  `context` tinyint(1) unsigned NOT NULL DEFAULT '2',
+  `language` char(3) NOT NULL DEFAULT '',
+  KEY `idx_word` (`term`),
+  KEY `idx_context` (`context`)
 ) ENGINE=MEMORY DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -1169,18 +1328,20 @@ CREATE TABLE `x8n17_finder_tokens` (
 -- Structure de la table `x8n17_finder_tokens_aggregate`
 --
 
-CREATE TABLE `x8n17_finder_tokens_aggregate` (
-  `term_id` int(10) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_finder_tokens_aggregate` (
+  `term_id` int(10) unsigned NOT NULL,
   `map_suffix` char(1) NOT NULL,
   `term` varchar(75) NOT NULL,
   `stem` varchar(75) NOT NULL,
-  `common` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
-  `phrase` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
-  `term_weight` float UNSIGNED NOT NULL,
-  `context` tinyint(1) UNSIGNED NOT NULL DEFAULT '2',
-  `context_weight` float UNSIGNED NOT NULL,
-  `total_weight` float UNSIGNED NOT NULL,
-  `language` char(3) NOT NULL DEFAULT ''
+  `common` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `phrase` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `term_weight` float unsigned NOT NULL,
+  `context` tinyint(1) unsigned NOT NULL DEFAULT '2',
+  `context_weight` float unsigned NOT NULL,
+  `total_weight` float unsigned NOT NULL,
+  `language` char(3) NOT NULL DEFAULT '',
+  KEY `token` (`term`),
+  KEY `keyword_id` (`term_id`)
 ) ENGINE=MEMORY DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -1189,11 +1350,257 @@ CREATE TABLE `x8n17_finder_tokens_aggregate` (
 -- Structure de la table `x8n17_finder_types`
 --
 
-CREATE TABLE `x8n17_finder_types` (
-  `id` int(10) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_finder_types` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(100) NOT NULL,
-  `mime` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `mime` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `title` (`title`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `x8n17_jdeveloper_components`
+--
+
+CREATE TABLE IF NOT EXISTS `x8n17_jdeveloper_components` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Primary key',
+  `ordering` smallint(5) NOT NULL COMMENT 'Table ordering',
+  `name` varchar(100) NOT NULL,
+  `version` varchar(20) NOT NULL,
+  `site` tinyint(1) DEFAULT NULL,
+  `display_name` varchar(100) NOT NULL,
+  `description` tinytext,
+  `params` text NOT NULL COMMENT 'JSON encoded params',
+  `created_by` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+
+--
+-- Contenu de la table `x8n17_jdeveloper_components`
+--
+
+INSERT INTO `x8n17_jdeveloper_components` (`id`, `ordering`, `name`, `version`, `site`, `display_name`, `description`, `params`, `created_by`) VALUES
+(1, 0, 'rssfeed', '1.0.0', 0, 'Rss Feed', 'this is the rss feefd reader', '{"author":"","author_email":"","author_url":"","copyright":"","languages":["fr-FR"],"license":""}', 192);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `x8n17_jdeveloper_fields`
+--
+
+CREATE TABLE IF NOT EXISTS `x8n17_jdeveloper_fields` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Primary key',
+  `ordering` smallint(5) NOT NULL COMMENT 'Table ordering',
+  `name` varchar(40) NOT NULL,
+  `table` int(11) NOT NULL,
+  `type` varchar(20) NOT NULL,
+  `dbtype` varchar(10) NOT NULL,
+  `rule` varchar(50) NOT NULL,
+  `label` varchar(40) NOT NULL,
+  `description` tinytext,
+  `maxlength` smallint(5) NOT NULL,
+  `options` text NOT NULL,
+  `attributes` text NOT NULL,
+  `params` text NOT NULL COMMENT 'JSON encoded params',
+  `created_by` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `x8n17_jdeveloper_formfields`
+--
+
+CREATE TABLE IF NOT EXISTS `x8n17_jdeveloper_formfields` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Primary key',
+  `name` varchar(40) NOT NULL,
+  `source` text NOT NULL,
+  `params` text NOT NULL COMMENT 'JSON encoded params',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `x8n17_jdeveloper_formrules`
+--
+
+CREATE TABLE IF NOT EXISTS `x8n17_jdeveloper_formrules` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Primary key',
+  `name` varchar(40) NOT NULL,
+  `source` text NOT NULL,
+  `params` text NOT NULL COMMENT 'JSON encoded params',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `x8n17_jdeveloper_forms`
+--
+
+CREATE TABLE IF NOT EXISTS `x8n17_jdeveloper_forms` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `parent_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `lft` int(11) unsigned NOT NULL DEFAULT '0',
+  `rgt` int(11) unsigned NOT NULL DEFAULT '0',
+  `level` int(11) unsigned NOT NULL DEFAULT '0',
+  `path` varchar(255) NOT NULL DEFAULT '',
+  `relation` varchar(50) NOT NULL DEFAULT '',
+  `tag` varchar(255) NOT NULL DEFAULT '',
+  `name` varchar(50) NOT NULL COMMENT 'Field name',
+  `type` varchar(50) NOT NULL COMMENT 'Field type',
+  `label` varchar(50) NOT NULL COMMENT 'Field label',
+  `description` mediumtext NOT NULL COMMENT 'Field Description',
+  `default` varchar(100) NOT NULL COMMENT 'Field default value',
+  `class` varchar(100) NOT NULL COMMENT 'Field CSS class',
+  `maxlength` int(10) NOT NULL COMMENT 'Field size',
+  `validation` varchar(50) NOT NULL COMMENT 'Field validation',
+  `filter` varchar(50) NOT NULL COMMENT 'Field filter',
+  `disabled` tinyint(1) NOT NULL,
+  `readonly` tinyint(1) NOT NULL,
+  `required` tinyint(1) NOT NULL,
+  `options` text NOT NULL,
+  `attributes` text NOT NULL,
+  `alias` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
+  `ordering` int(11) NOT NULL DEFAULT '0',
+  `created_by` int(11) unsigned NOT NULL DEFAULT '0',
+  `params` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=9 ;
+
+--
+-- Contenu de la table `x8n17_jdeveloper_forms`
+--
+
+INSERT INTO `x8n17_jdeveloper_forms` (`id`, `parent_id`, `lft`, `rgt`, `level`, `path`, `relation`, `tag`, `name`, `type`, `label`, `description`, `default`, `class`, `maxlength`, `validation`, `filter`, `disabled`, `readonly`, `required`, `options`, `attributes`, `alias`, `ordering`, `created_by`, `params`) VALUES
+(1, 0, 0, 15, 0, '', '', '', 'Root', '', '', '', '', '', 0, '', '', 0, 0, 0, '', '', 'root', 0, 0, ''),
+(2, 1, 1, 2, 1, 'component-1-access', 'component.1.access', 'access', 'component.1.access', '', '', '', '', '', 0, '', '', 0, 0, 0, '', '', 'component-1-access', 1, 192, ''),
+(3, 1, 3, 4, 1, 'component-1-config', 'component.1.config', 'config', 'component.1.config', '', '', '', '', '', 0, '', '', 0, 0, 0, '', '', 'component-1-config', 2, 192, ''),
+(4, 1, 5, 14, 1, 'table-1-form', 'table.1.form', 'form', 'table.1.form', '', '', '', '', '', 0, '', '', 0, 0, 0, '', '', 'table-1-form', 3, 192, ''),
+(5, 4, 6, 9, 2, 'table-1-form/params', 'table.1.form', 'fields', 'params', '', '', '', '', '', 0, '', '', 0, 0, 0, '', '', 'params', 4, 192, ''),
+(6, 5, 7, 8, 3, 'table-1-form/params/params', 'table.1.form', 'fieldset', 'params', '', '', '', '', '', 0, '', '', 0, 0, 0, '', '', 'params', 5, 192, ''),
+(7, 4, 10, 13, 2, 'table-1-form/images', 'table.1.form', 'fields', 'images', '', '', '', '', '', 0, '', '', 0, 0, 0, '', '', 'images', 6, 192, ''),
+(8, 7, 11, 12, 3, 'table-1-form/images/images', 'table.1.form', 'fieldset', 'images', '', '', '', '', '', 0, '', '', 0, 0, 0, '', '', 'images', 7, 192, '');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `x8n17_jdeveloper_libraries`
+--
+
+CREATE TABLE IF NOT EXISTS `x8n17_jdeveloper_libraries` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Primary key',
+  `name` varchar(40) NOT NULL,
+  `display_name` varchar(100) NOT NULL,
+  `version` varchar(20) NOT NULL,
+  `description` tinytext,
+  `params` text NOT NULL COMMENT 'JSON encoded params',
+  `created_by` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `x8n17_jdeveloper_modules`
+--
+
+CREATE TABLE IF NOT EXISTS `x8n17_jdeveloper_modules` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Primary key',
+  `ordering` smallint(5) NOT NULL COMMENT 'Table ordering',
+  `name` varchar(40) NOT NULL,
+  `display_name` varchar(100) NOT NULL,
+  `version` varchar(20) NOT NULL,
+  `table` varchar(100) NOT NULL,
+  `description` tinytext,
+  `params` text NOT NULL COMMENT 'JSON encoded params',
+  `created_by` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `x8n17_jdeveloper_overrides`
+--
+
+CREATE TABLE IF NOT EXISTS `x8n17_jdeveloper_overrides` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Primary key',
+  `item_id` int(11) NOT NULL COMMENT 'prmary key of the item',
+  `type` varchar(50) NOT NULL COMMENT 'extension / element type',
+  `name` varchar(255) NOT NULL COMMENT 'template name',
+  `source` mediumtext NOT NULL COMMENT 'template override',
+  `params` text NOT NULL COMMENT 'JSON encoded params',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `x8n17_jdeveloper_plugins`
+--
+
+CREATE TABLE IF NOT EXISTS `x8n17_jdeveloper_plugins` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Primary key',
+  `ordering` smallint(5) NOT NULL COMMENT 'Table ordering',
+  `name` varchar(40) NOT NULL,
+  `display_name` varchar(100) NOT NULL,
+  `version` varchar(20) NOT NULL,
+  `folder` varchar(40) NOT NULL,
+  `description` tinytext,
+  `params` text NOT NULL COMMENT 'JSON encoded params',
+  `created_by` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `x8n17_jdeveloper_tables`
+--
+
+CREATE TABLE IF NOT EXISTS `x8n17_jdeveloper_tables` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Primary key',
+  `ordering` smallint(5) NOT NULL COMMENT 'Table ordering',
+  `name` varchar(40) NOT NULL,
+  `component` int(11) NOT NULL,
+  `plural` varchar(40) NOT NULL,
+  `singular` varchar(40) NOT NULL,
+  `pk` varchar(40) NOT NULL,
+  `jfields` text NOT NULL COMMENT 'JSON encoded jfields',
+  `params` text NOT NULL COMMENT 'JSON encoded params',
+  `created_by` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+
+--
+-- Contenu de la table `x8n17_jdeveloper_tables`
+--
+
+INSERT INTO `x8n17_jdeveloper_tables` (`id`, `ordering`, `name`, `component`, `plural`, `singular`, `pk`, `jfields`, `params`, `created_by`) VALUES
+(1, 1, 'feed', 1, 'Feeds', 'Feed', 'id', '{"access":"0","alias":"1","asset_id":"0","catid":"1","checked_out":"0","created":"1","created_by":"1","created_by_alias":"0","hits":"0","images":"0","language":"0","metadata":"0","metadesc":"0","metakey":"0","modified":"0","modified_by":"0","ordering":"0","params":"0","publish_down":"1","publish_up":"1","published":"0","tags":"0","version":"0"}', '{"frontend":"1","frontend_categories":"0","frontend_details":"0","frontend_edit":"1","frontend_feed":"0"}', 192);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `x8n17_jdeveloper_templates`
+--
+
+CREATE TABLE IF NOT EXISTS `x8n17_jdeveloper_templates` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Primary key',
+  `ordering` smallint(5) NOT NULL COMMENT 'Table ordering',
+  `name` varchar(40) NOT NULL,
+  `version` varchar(20) NOT NULL,
+  `display_name` varchar(100) NOT NULL,
+  `description` tinytext,
+  `params` text NOT NULL COMMENT 'JSON encoded params',
+  `created_by` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -1201,13 +1608,15 @@ CREATE TABLE `x8n17_finder_types` (
 -- Structure de la table `x8n17_komento_acl`
 --
 
-CREATE TABLE `x8n17_komento_acl` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_komento_acl` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `cid` varchar(255) NOT NULL,
   `component` varchar(255) NOT NULL,
   `type` varchar(255) NOT NULL,
-  `rules` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `rules` text NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `komento_acl_content_type` (`type`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=10 ;
 
 --
 -- Contenu de la table `x8n17_komento_acl`
@@ -1230,13 +1639,16 @@ INSERT INTO `x8n17_komento_acl` (`id`, `cid`, `component`, `type`, `rules`) VALU
 -- Structure de la table `x8n17_komento_actions`
 --
 
-CREATE TABLE `x8n17_komento_actions` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_komento_actions` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `type` varchar(20) NOT NULL,
-  `comment_id` bigint(20) UNSIGNED NOT NULL,
-  `action_by` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
-  `actioned` datetime NOT NULL DEFAULT '0000-00-00 00:00:00'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `comment_id` bigint(20) unsigned NOT NULL,
+  `action_by` bigint(20) unsigned NOT NULL DEFAULT '0',
+  `actioned` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`),
+  KEY `komento_actions` (`type`,`comment_id`,`action_by`),
+  KEY `komento_actions_comment_id` (`comment_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -1244,22 +1656,23 @@ CREATE TABLE `x8n17_komento_actions` (
 -- Structure de la table `x8n17_komento_activities`
 --
 
-CREATE TABLE `x8n17_komento_activities` (
-  `id` bigint(20) NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_komento_activities` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `type` varchar(20) NOT NULL,
   `comment_id` bigint(20) NOT NULL,
   `uid` bigint(20) NOT NULL,
   `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `published` tinyint(1) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `published` tinyint(1) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=9 ;
 
 --
 -- Contenu de la table `x8n17_komento_activities`
 --
 
 INSERT INTO `x8n17_komento_activities` (`id`, `type`, `comment_id`, `uid`, `created`, `published`) VALUES
-(1, 'reply', 3, 192, '2016-01-30 14:35:26', 1),
-(2, 'comment', 4, 192, '2016-01-30 15:32:25', 1);
+(2, 'comment', 4, 192, '2016-01-30 15:32:25', 1),
+(3, 'reply', 10, 192, '2016-02-01 13:46:39', 1);
 
 -- --------------------------------------------------------
 
@@ -1267,11 +1680,12 @@ INSERT INTO `x8n17_komento_activities` (`id`, `type`, `comment_id`, `uid`, `crea
 -- Structure de la table `x8n17_komento_captcha`
 --
 
-CREATE TABLE `x8n17_komento_captcha` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_komento_captcha` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `response` varchar(5) NOT NULL,
-  `created` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `created` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -1279,50 +1693,51 @@ CREATE TABLE `x8n17_komento_captcha` (
 -- Structure de la table `x8n17_komento_comments`
 --
 
-CREATE TABLE `x8n17_komento_comments` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_komento_comments` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `component` varchar(255) NOT NULL,
-  `cid` bigint(20) UNSIGNED NOT NULL,
+  `cid` bigint(20) unsigned NOT NULL,
   `comment` text,
   `name` varchar(255) NOT NULL,
   `title` varchar(255) NOT NULL,
   `email` varchar(255) DEFAULT '',
   `url` varchar(255) DEFAULT '',
   `ip` varchar(255) DEFAULT '',
-  `created_by` bigint(20) UNSIGNED DEFAULT '0',
+  `created_by` bigint(20) unsigned DEFAULT '0',
   `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `modified_by` bigint(20) UNSIGNED DEFAULT '0',
+  `modified_by` bigint(20) unsigned DEFAULT '0',
   `modified` datetime DEFAULT '0000-00-00 00:00:00',
-  `deleted_by` bigint(20) UNSIGNED DEFAULT '0',
+  `deleted_by` bigint(20) unsigned DEFAULT '0',
   `deleted` datetime DEFAULT '0000-00-00 00:00:00',
   `flag` tinyint(1) DEFAULT '0',
-  `published` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+  `published` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `publish_up` datetime DEFAULT '0000-00-00 00:00:00',
   `publish_down` datetime DEFAULT '0000-00-00 00:00:00',
-  `sticked` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+  `sticked` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `sent` tinyint(1) DEFAULT '0',
-  `parent_id` int(11) UNSIGNED DEFAULT '0',
-  `lft` int(11) UNSIGNED NOT NULL DEFAULT '0',
-  `rgt` int(11) UNSIGNED NOT NULL DEFAULT '0',
-  `depth` int(11) UNSIGNED NOT NULL DEFAULT '0',
+  `parent_id` int(11) unsigned DEFAULT '0',
+  `lft` int(11) unsigned NOT NULL DEFAULT '0',
+  `rgt` int(11) unsigned NOT NULL DEFAULT '0',
+  `depth` int(11) unsigned NOT NULL DEFAULT '0',
   `latitude` varchar(255) DEFAULT NULL,
   `longitude` varchar(255) DEFAULT NULL,
   `address` text,
   `params` text,
-  `ratings` int(11) UNSIGNED DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `ratings` int(11) unsigned DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `komento_threaded` (`component`,`cid`,`published`,`lft`,`rgt`),
+  KEY `komento_threaded_reverse` (`component`,`cid`,`published`,`rgt`),
+  KEY `komento_module_comments` (`component`,`cid`,`published`,`created`),
+  KEY `komento_backend` (`parent_id`,`created`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
 
 --
 -- Contenu de la table `x8n17_komento_comments`
 --
 
 INSERT INTO `x8n17_komento_comments` (`id`, `component`, `cid`, `comment`, `name`, `title`, `email`, `url`, `ip`, `created_by`, `created`, `modified_by`, `modified`, `deleted_by`, `deleted`, `flag`, `published`, `publish_up`, `publish_down`, `sticked`, `sent`, `parent_id`, `lft`, `rgt`, `depth`, `latitude`, `longitude`, `address`, `params`, `ratings`) VALUES
-(1, 'com_content', 1, 'test comment', 'heri', '', 'njaka.elisa@gmail.com', '', '127.0.0.1', 0, '2016-01-30 13:08:27', 0, '2016-01-30 13:08:27', 0, '0000-00-00 00:00:00', 0, 1, '2016-01-30 13:08:27', '0000-00-00 00:00:00', 0, 0, 0, 1, 4, 0, '', '', '', NULL, 0),
-(2, 'com_content', 1, 'd dqsdqsdqsd dq', 'dsqdqs', '', 'ddqdd@dsd.com', '', '127.0.0.1', 0, '2016-01-30 14:08:08', 0, '2016-01-30 14:08:08', 0, '0000-00-00 00:00:00', 0, 1, '2016-01-30 14:08:08', '0000-00-00 00:00:00', 0, 0, 0, 5, 6, 0, '', '', '', NULL, 0),
-(3, 'com_content', 1, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad m', 'Super Utilisateur', '', 'test.admin@site.com', '', '127.0.0.1', 192, '2016-01-30 14:35:26', 0, '2016-01-30 14:35:26', 0, '0000-00-00 00:00:00', 0, 1, '2016-01-30 14:35:26', '0000-00-00 00:00:00', 0, 0, 1, 2, 3, 1, '', '', '', NULL, 0),
-(4, 'com_content', 1, 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipis', 'Super Utilisateur', '', 'test.admin@site.com', '', '127.0.0.1', 192, '2016-01-30 15:32:25', 0, '2016-01-30 15:32:25', 0, '0000-00-00 00:00:00', 0, 1, '2016-01-30 15:32:25', '0000-00-00 00:00:00', 0, 0, 0, 7, 8, 0, '', '', '', NULL, 0),
-(5, 'com_content', 1, 'qd dq dqsdqdq', 'Super Utilisateur', '', 'test.admin@site.com', '', '127.0.0.1', 192, '2016-01-30 15:33:56', 0, '0000-00-00 00:00:00', 0, '0000-00-00 00:00:00', 0, 2, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 0, 0, 0, 9, 10, 0, '', '', '', NULL, 0),
-(6, 'com_content', 1, 'teststsdsd qs qdq ssqdqsdqs', 'Super Utilisateur', '', 'test.admin@site.com', '', '127.0.0.1', 192, '2016-01-30 15:55:41', 0, '0000-00-00 00:00:00', 0, '0000-00-00 00:00:00', 0, 2, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 0, 0, 0, 11, 12, 0, '', '', '', NULL, 0);
+(4, 'com_content', 1, 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipis', 'Super Utilisateur', '', 'test.admin@site.com', '', '127.0.0.1', 192, '2016-01-30 15:32:25', 0, '2016-01-30 15:32:25', 0, '0000-00-00 00:00:00', 0, 1, '2016-02-01 13:46:39', '0000-00-00 00:00:00', 0, 0, 0, 9, 14, 0, '', '', '', '{}', 0),
+(10, 'com_content', 1, 'merci', 'Super Utilisateur', '', 'test.admin@site.com', '', '127.0.0.1', 192, '2016-02-01 13:45:56', 0, '0000-00-00 00:00:00', 0, '0000-00-00 00:00:00', 0, 1, '2016-02-01 13:46:39', '0000-00-00 00:00:00', 0, 0, 4, 12, 13, 1, '', '', '', '{}', 0);
 
 -- --------------------------------------------------------
 
@@ -1330,7 +1745,7 @@ INSERT INTO `x8n17_komento_comments` (`id`, `component`, `cid`, `comment`, `name
 -- Structure de la table `x8n17_komento_configs`
 --
 
-CREATE TABLE `x8n17_komento_configs` (
+CREATE TABLE IF NOT EXISTS `x8n17_komento_configs` (
   `component` varchar(255) NOT NULL,
   `params` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -1352,13 +1767,16 @@ INSERT INTO `x8n17_komento_configs` (`component`, `params`) VALUES
 -- Structure de la table `x8n17_komento_hashkeys`
 --
 
-CREATE TABLE `x8n17_komento_hashkeys` (
-  `id` bigint(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_komento_hashkeys` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT,
   `uid` bigint(11) NOT NULL,
   `type` varchar(255) NOT NULL,
   `state` tinyint(1) NOT NULL DEFAULT '0',
-  `key` text NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  `key` text NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `uid` (`uid`),
+  KEY `type` (`type`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
 
 --
 -- Contenu de la table `x8n17_komento_hashkeys`
@@ -1366,7 +1784,11 @@ CREATE TABLE `x8n17_komento_hashkeys` (
 
 INSERT INTO `x8n17_komento_hashkeys` (`id`, `uid`, `type`, `state`, `key`) VALUES
 (1, 5, 'comment', 0, '4bdad19c9471'),
-(2, 6, 'comment', 0, 'a2d2f67c29b5');
+(2, 6, 'comment', 0, 'a2d2f67c29b5'),
+(3, 7, 'comment', 0, 'a4b6d5fef7b5'),
+(4, 8, 'comment', 0, 'b9046dd0f719'),
+(5, 9, 'comment', 0, 'e802e415cdf9'),
+(6, 10, 'comment', 0, '28c6ea71b973');
 
 -- --------------------------------------------------------
 
@@ -1374,12 +1796,14 @@ INSERT INTO `x8n17_komento_hashkeys` (`id`, `uid`, `type`, `state`, `key`) VALUE
 -- Structure de la table `x8n17_komento_ipfilter`
 --
 
-CREATE TABLE `x8n17_komento_ipfilter` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_komento_ipfilter` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `component` varchar(255) NOT NULL,
   `ip` varchar(20) NOT NULL,
-  `rules` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `rules` text NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `komento_ipfilter` (`component`,`ip`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -1387,8 +1811,8 @@ CREATE TABLE `x8n17_komento_ipfilter` (
 -- Structure de la table `x8n17_komento_mailq`
 --
 
-CREATE TABLE `x8n17_komento_mailq` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_komento_mailq` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `mailfrom` varchar(255) DEFAULT NULL,
   `fromname` varchar(255) DEFAULT NULL,
   `recipient` varchar(255) NOT NULL,
@@ -1396,8 +1820,10 @@ CREATE TABLE `x8n17_komento_mailq` (
   `body` text NOT NULL,
   `created` datetime NOT NULL,
   `type` varchar(10) NOT NULL DEFAULT 'text',
-  `status` tinyint(1) NOT NULL DEFAULT '0'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  `status` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `komento_mailq_status` (`status`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
 
 --
 -- Contenu de la table `x8n17_komento_mailq`
@@ -1407,7 +1833,13 @@ INSERT INTO `x8n17_komento_mailq` (`id`, `mailfrom`, `fromname`, `recipient`, `s
 (1, 'test.admin@site.com', 'Test', 'test.admin@site.com', 'A new comment is posted (Etude de votre prêt)', '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n<html xmlns="http://www.w3.org/1999/xhtml">\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />\n<title></title>\n</head>\n\n<body style="margin:0;padding:0;background:#ddd;">\n	<div style="width:100%;background:#ddd;margin:0;padding:50px 0 80px;color:#798796;font-family:''Lucida Grande'',Tahoma,Arial;font-size:12px;">\n\n	<center style="display:block;padding:30px 0">\n		<table cellpadding="0" cellspacing="0" border="0" style="width:590px;background:#fff;border:1px solid #b5bbc1;border-bottom-color:#9ba3ab;border-radius:4px;-moz-border-radius:4px;-webkit-border-radius:4px;">\n			<tbody>\n				<tr>\n					<td style="padding:20px;border-bottom:1px solid #b5bbc1;;background:#f5f5f5;border-radius:3px 3px 0 0;-moz-border-radius:3px 3px 0 0;-webkit-border-radius:3px 3px 0 0;">\n						Good day Super Utilisateur,\n						<br /><br />\n						A new comment is posted on:						<br />\n						<a href="http://www.sit2.loc/index.php" style="font-weight:bold;color:#477fda;text-decoration:none;font-size:16px;line-height:20px">Etude de votre prêt</a>\n						<br />\n						<br />\n						Below is a snippet from the comment that has been posted.					</td>\n				</tr>\n				<tr>\n					<td style="padding:15px 20px;line-height:1.5;color:#555;font-family:''Lucida Grande'',Tahoma,Arial;font-size:12px;text-align:left">\n						<div style="display:inline-block;width:100%;padding-bottom:20px;">\n							<img src="http://www.gravatar.com/avatar/d41d8cd98f00b204e9800998ecf8427e?s=100&amp;d=mm" width="50" style="float:left;width:50px;height:auto;border-radius:3px;-moz-border-radius:3px;-webkit-border-radius:3px;" />\n							<div style="margin-left:60px">\n								<span style="font-weight:bold;color:#477fda;text-decoration:none">Guest - heri</span>\n								<span style="color:#999">- Posted on samedi, Jan 30 2016 1:08:27pm</span>\n								<div style="font-size:12px;margin-top:3px;">\n									test comment								</div>\n							</div>\n						</div>\n\n						<div style="color:#555;clear:both;border-top:1px solid #ddd;padding:20px 0 10px">\n							<a href="http://www.sit2.loc/index.php#kmt-1" target="_blank" style="display:inline-block;padding:5px 15px;background:#fc0;border:1px solid #caa200;border-bottom-color:#977900;color:#534200;text-shadow:0 1px 0 #ffe684;font-weight:bold;box-shadow:inset 0 1px 0 #ffe064;-moz-box-shadow:inset 0 1px 0 #ffe064;-webkit-box-shadow:inset 0 1px 0 #ffe064;border-radius:2px;moz-border-radius:2px;-webkit-border-radius:2px;text-decoration:none!important">\n								View Comment &nbsp; &raquo;							</a>\n						</div>\n					</td>\n				</tr>\n			</tbody>\n		</table>\n\n			</center>\n\n	</div>\n</body>\n</html>\n', '2016-01-30 13:08:27', 'html', 1),
 (2, 'test.admin@site.com', 'Test', 'test.admin@site.com', 'A new comment is posted (Etude de votre prêt)', '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n<html xmlns="http://www.w3.org/1999/xhtml">\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />\n<title></title>\n</head>\n\n<body style="margin:0;padding:0;background:#ddd;">\n	<div style="width:100%;background:#ddd;margin:0;padding:50px 0 80px;color:#798796;font-family:''Lucida Grande'',Tahoma,Arial;font-size:12px;">\n\n	<center style="display:block;padding:30px 0">\n		<table cellpadding="0" cellspacing="0" border="0" style="width:590px;background:#fff;border:1px solid #b5bbc1;border-bottom-color:#9ba3ab;border-radius:4px;-moz-border-radius:4px;-webkit-border-radius:4px;">\n			<tbody>\n				<tr>\n					<td style="padding:20px;border-bottom:1px solid #b5bbc1;;background:#f5f5f5;border-radius:3px 3px 0 0;-moz-border-radius:3px 3px 0 0;-webkit-border-radius:3px 3px 0 0;">\n						Good day Super Utilisateur,\n						<br /><br />\n						A new comment is posted on:						<br />\n						<a href="http://www.sit2.loc/index.php" style="font-weight:bold;color:#477fda;text-decoration:none;font-size:16px;line-height:20px">Etude de votre prêt</a>\n						<br />\n						<br />\n						Below is a snippet from the comment that has been posted.					</td>\n				</tr>\n				<tr>\n					<td style="padding:15px 20px;line-height:1.5;color:#555;font-family:''Lucida Grande'',Tahoma,Arial;font-size:12px;text-align:left">\n						<div style="display:inline-block;width:100%;padding-bottom:20px;">\n							<img src="http://www.gravatar.com/avatar/d41d8cd98f00b204e9800998ecf8427e?s=100&amp;d=identicon" width="50" style="float:left;width:50px;height:auto;border-radius:3px;-moz-border-radius:3px;-webkit-border-radius:3px;" />\n							<div style="margin-left:60px">\n								<span style="font-weight:bold;color:#477fda;text-decoration:none">Guest - dsqdqs</span>\n								<span style="color:#999">- Posted on samedi, Jan 30 2016 2:08:08pm</span>\n								<div style="font-size:12px;margin-top:3px;">\n									d dqsdqsdqsd dq								</div>\n							</div>\n						</div>\n\n						<div style="color:#555;clear:both;border-top:1px solid #ddd;padding:20px 0 10px">\n							<a href="http://www.sit2.loc/index.php#kmt-2" target="_blank" style="display:inline-block;padding:5px 15px;background:#fc0;border:1px solid #caa200;border-bottom-color:#977900;color:#534200;text-shadow:0 1px 0 #ffe684;font-weight:bold;box-shadow:inset 0 1px 0 #ffe064;-moz-box-shadow:inset 0 1px 0 #ffe064;-webkit-box-shadow:inset 0 1px 0 #ffe064;border-radius:2px;moz-border-radius:2px;-webkit-border-radius:2px;text-decoration:none!important">\n								View Comment &nbsp; &raquo;							</a>\n						</div>\n					</td>\n				</tr>\n			</tbody>\n		</table>\n\n			</center>\n\n	</div>\n</body>\n</html>\n', '2016-01-30 14:08:08', 'html', 1),
 (3, 'test.admin@site.com', 'Test', 'ddqdd@dsd.com', 'A new comment is posted (Etude de votre prêt)', '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n<html xmlns="http://www.w3.org/1999/xhtml">\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />\n<title></title>\n</head>\n\n<body style="margin:0;padding:0;background:#ddd;">\n	<div style="width:100%;background:#ddd;margin:0;padding:50px 0 80px;color:#798796;font-family:''Lucida Grande'',Tahoma,Arial;font-size:12px;">\n\n	<center style="display:block;padding:30px 0">\n		<table cellpadding="0" cellspacing="0" border="0" style="width:590px;background:#fff;border:1px solid #b5bbc1;border-bottom-color:#9ba3ab;border-radius:4px;-moz-border-radius:4px;-webkit-border-radius:4px;">\n			<tbody>\n				<tr>\n					<td style="padding:20px;border-bottom:1px solid #b5bbc1;;background:#f5f5f5;border-radius:3px 3px 0 0;-moz-border-radius:3px 3px 0 0;-webkit-border-radius:3px 3px 0 0;">\n						Good day dsqdqs,\n						<br /><br />\n						A new comment is posted on:						<br />\n						<a href="http://www.sit2.loc/index.php" style="font-weight:bold;color:#477fda;text-decoration:none;font-size:16px;line-height:20px">Etude de votre prêt</a>\n						<br />\n						<br />\n						Below is a snippet from the comment that has been posted.					</td>\n				</tr>\n				<tr>\n					<td style="padding:15px 20px;line-height:1.5;color:#555;font-family:''Lucida Grande'',Tahoma,Arial;font-size:12px;text-align:left">\n						<div style="display:inline-block;width:100%;padding-bottom:20px;">\n							<img src="http://www.gravatar.com/avatar/616982535852e75220612838970b7a02?s=100&amp;d=identicon" width="50" style="float:left;width:50px;height:auto;border-radius:3px;-moz-border-radius:3px;-webkit-border-radius:3px;" />\n							<div style="margin-left:60px">\n								<span style="font-weight:bold;color:#477fda;text-decoration:none">Super Utilisateur</span>\n								<span style="color:#999">- Posted on samedi, Jan 30 2016 2:35:26pm</span>\n								<div style="font-size:12px;margin-top:3px;">\n									Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad m								</div>\n							</div>\n						</div>\n\n						<div style="color:#555;clear:both;border-top:1px solid #ddd;padding:20px 0 10px">\n							<a href="http://www.sit2.loc/index.php#kmt-3" target="_blank" style="display:inline-block;padding:5px 15px;background:#fc0;border:1px solid #caa200;border-bottom-color:#977900;color:#534200;text-shadow:0 1px 0 #ffe684;font-weight:bold;box-shadow:inset 0 1px 0 #ffe064;-moz-box-shadow:inset 0 1px 0 #ffe064;-webkit-box-shadow:inset 0 1px 0 #ffe064;border-radius:2px;moz-border-radius:2px;-webkit-border-radius:2px;text-decoration:none!important">\n								View Comment &nbsp; &raquo;							</a>\n						</div>\n					</td>\n				</tr>\n			</tbody>\n		</table>\n\n				<p>\n			This email was sent to you because you have subscribed to comments update<br />To unsubscribe, <a href="http://www.sit2.loc/index.php?option=com_komento&task=unsubscribe&id=1" style="color:#477fda">click here</a>.\n		</p>\n			</center>\n\n	</div>\n</body>\n</html>\n', '2016-01-30 14:35:26', 'html', 1),
-(4, 'test.admin@site.com', 'Test', 'ddqdd@dsd.com', 'A new comment is posted (Etude de votre prêt)', '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n<html xmlns="http://www.w3.org/1999/xhtml">\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />\n<title></title>\n</head>\n\n<body style="margin:0;padding:0;background:#ddd;">\n	<div style="width:100%;background:#ddd;margin:0;padding:50px 0 80px;color:#798796;font-family:''Lucida Grande'',Tahoma,Arial;font-size:12px;">\n\n	<center style="display:block;padding:30px 0">\n		<table cellpadding="0" cellspacing="0" border="0" style="width:590px;background:#fff;border:1px solid #b5bbc1;border-bottom-color:#9ba3ab;border-radius:4px;-moz-border-radius:4px;-webkit-border-radius:4px;">\n			<tbody>\n				<tr>\n					<td style="padding:20px;border-bottom:1px solid #b5bbc1;;background:#f5f5f5;border-radius:3px 3px 0 0;-moz-border-radius:3px 3px 0 0;-webkit-border-radius:3px 3px 0 0;">\n						Good day dsqdqs,\n						<br /><br />\n						A new comment is posted on:						<br />\n						<a href="http://www.sit2.loc/index.php" style="font-weight:bold;color:#477fda;text-decoration:none;font-size:16px;line-height:20px">Etude de votre prêt</a>\n						<br />\n						<br />\n						Below is a snippet from the comment that has been posted.					</td>\n				</tr>\n				<tr>\n					<td style="padding:15px 20px;line-height:1.5;color:#555;font-family:''Lucida Grande'',Tahoma,Arial;font-size:12px;text-align:left">\n						<div style="display:inline-block;width:100%;padding-bottom:20px;">\n							<img src="http://www.gravatar.com/avatar/616982535852e75220612838970b7a02?s=100&amp;d=identicon" width="50" style="float:left;width:50px;height:auto;border-radius:3px;-moz-border-radius:3px;-webkit-border-radius:3px;" />\n							<div style="margin-left:60px">\n								<span style="font-weight:bold;color:#477fda;text-decoration:none">Super Utilisateur</span>\n								<span style="color:#999">- Posted on samedi, Jan 30 2016 3:32:25pm</span>\n								<div style="font-size:12px;margin-top:3px;">\n									Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipis								</div>\n							</div>\n						</div>\n\n						<div style="color:#555;clear:both;border-top:1px solid #ddd;padding:20px 0 10px">\n							<a href="http://www.sit2.loc/index.php#kmt-4" target="_blank" style="display:inline-block;padding:5px 15px;background:#fc0;border:1px solid #caa200;border-bottom-color:#977900;color:#534200;text-shadow:0 1px 0 #ffe684;font-weight:bold;box-shadow:inset 0 1px 0 #ffe064;-moz-box-shadow:inset 0 1px 0 #ffe064;-webkit-box-shadow:inset 0 1px 0 #ffe064;border-radius:2px;moz-border-radius:2px;-webkit-border-radius:2px;text-decoration:none!important">\n								View Comment &nbsp; &raquo;							</a>\n						</div>\n					</td>\n				</tr>\n			</tbody>\n		</table>\n\n				<p>\n			This email was sent to you because you have subscribed to comments update<br />To unsubscribe, <a href="http://www.sit2.loc/index.php?option=com_komento&task=unsubscribe&id=1" style="color:#477fda">click here</a>.\n		</p>\n			</center>\n\n	</div>\n</body>\n</html>\n', '2016-01-30 15:32:25', 'html', 1);
+(4, 'test.admin@site.com', 'Test', 'ddqdd@dsd.com', 'A new comment is posted (Etude de votre prêt)', '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n<html xmlns="http://www.w3.org/1999/xhtml">\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />\n<title></title>\n</head>\n\n<body style="margin:0;padding:0;background:#ddd;">\n	<div style="width:100%;background:#ddd;margin:0;padding:50px 0 80px;color:#798796;font-family:''Lucida Grande'',Tahoma,Arial;font-size:12px;">\n\n	<center style="display:block;padding:30px 0">\n		<table cellpadding="0" cellspacing="0" border="0" style="width:590px;background:#fff;border:1px solid #b5bbc1;border-bottom-color:#9ba3ab;border-radius:4px;-moz-border-radius:4px;-webkit-border-radius:4px;">\n			<tbody>\n				<tr>\n					<td style="padding:20px;border-bottom:1px solid #b5bbc1;;background:#f5f5f5;border-radius:3px 3px 0 0;-moz-border-radius:3px 3px 0 0;-webkit-border-radius:3px 3px 0 0;">\n						Good day dsqdqs,\n						<br /><br />\n						A new comment is posted on:						<br />\n						<a href="http://www.sit2.loc/index.php" style="font-weight:bold;color:#477fda;text-decoration:none;font-size:16px;line-height:20px">Etude de votre prêt</a>\n						<br />\n						<br />\n						Below is a snippet from the comment that has been posted.					</td>\n				</tr>\n				<tr>\n					<td style="padding:15px 20px;line-height:1.5;color:#555;font-family:''Lucida Grande'',Tahoma,Arial;font-size:12px;text-align:left">\n						<div style="display:inline-block;width:100%;padding-bottom:20px;">\n							<img src="http://www.gravatar.com/avatar/616982535852e75220612838970b7a02?s=100&amp;d=identicon" width="50" style="float:left;width:50px;height:auto;border-radius:3px;-moz-border-radius:3px;-webkit-border-radius:3px;" />\n							<div style="margin-left:60px">\n								<span style="font-weight:bold;color:#477fda;text-decoration:none">Super Utilisateur</span>\n								<span style="color:#999">- Posted on samedi, Jan 30 2016 3:32:25pm</span>\n								<div style="font-size:12px;margin-top:3px;">\n									Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipis								</div>\n							</div>\n						</div>\n\n						<div style="color:#555;clear:both;border-top:1px solid #ddd;padding:20px 0 10px">\n							<a href="http://www.sit2.loc/index.php#kmt-4" target="_blank" style="display:inline-block;padding:5px 15px;background:#fc0;border:1px solid #caa200;border-bottom-color:#977900;color:#534200;text-shadow:0 1px 0 #ffe684;font-weight:bold;box-shadow:inset 0 1px 0 #ffe064;-moz-box-shadow:inset 0 1px 0 #ffe064;-webkit-box-shadow:inset 0 1px 0 #ffe064;border-radius:2px;moz-border-radius:2px;-webkit-border-radius:2px;text-decoration:none!important">\n								View Comment &nbsp; &raquo;							</a>\n						</div>\n					</td>\n				</tr>\n			</tbody>\n		</table>\n\n				<p>\n			This email was sent to you because you have subscribed to comments update<br />To unsubscribe, <a href="http://www.sit2.loc/index.php?option=com_komento&task=unsubscribe&id=1" style="color:#477fda">click here</a>.\n		</p>\n			</center>\n\n	</div>\n</body>\n</html>\n', '2016-01-30 15:32:25', 'html', 1),
+(5, 'test.admin@site.com', 'Test', 'ddqdd@dsd.com', 'A new comment is posted (Etude de votre prêt immobilier)', '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\r\n<html xmlns="http://www.w3.org/1999/xhtml">\r\n<head>\r\n<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />\r\n<title></title>\r\n</head>\r\n\r\n<body style="margin:0;padding:0;background:#ddd;">\r\n	<div style="width:100%;background:#ddd;margin:0;padding:50px 0 80px;color:#798796;font-family:''Lucida Grande'',Tahoma,Arial;font-size:12px;">\r\n\r\n	<center style="display:block;padding:30px 0">\r\n		<table cellpadding="0" cellspacing="0" border="0" style="width:590px;background:#fff;border:1px solid #b5bbc1;border-bottom-color:#9ba3ab;border-radius:4px;-moz-border-radius:4px;-webkit-border-radius:4px;">\r\n			<tbody>\r\n				<tr>\r\n					<td style="padding:20px;border-bottom:1px solid #b5bbc1;;background:#f5f5f5;border-radius:3px 3px 0 0;-moz-border-radius:3px 3px 0 0;-webkit-border-radius:3px 3px 0 0;">\r\n						Good day dsqdqs,\r\n						<br /><br />\r\n						A new comment is posted on:						<br />\r\n						<a href="http://www.p-etech.loc/index.php?option=com_content&amp;view=article&amp;id=1:etude-de-votre-pret-immobilier&amp;catid=2:non-categorise&amp;Itemid=101" style="font-weight:bold;color:#477fda;text-decoration:none;font-size:16px;line-height:20px">Etude de votre prêt immobilier</a>\r\n						<br />\r\n						<br />\r\n						Below is a snippet from the comment that has been posted.					</td>\r\n				</tr>\r\n				<tr>\r\n					<td style="padding:15px 20px;line-height:1.5;color:#555;font-family:''Lucida Grande'',Tahoma,Arial;font-size:12px;text-align:left">\r\n						<div style="display:inline-block;width:100%;padding-bottom:20px;">\r\n							<img src="http://www.gravatar.com/avatar/616982535852e75220612838970b7a02?s=100&amp;d=identicon" width="50" style="float:left;width:50px;height:auto;border-radius:3px;-moz-border-radius:3px;-webkit-border-radius:3px;" />\r\n							<div style="margin-left:60px">\r\n								<span style="font-weight:bold;color:#477fda;text-decoration:none">Super Utilisateur</span>\r\n								<span style="color:#999">- Posted on lundi, Fév 1 2016 1:45:56pm</span>\r\n								<div style="font-size:12px;margin-top:3px;">\r\n									merci								</div>\r\n							</div>\r\n						</div>\r\n\r\n						<div style="color:#555;clear:both;border-top:1px solid #ddd;padding:20px 0 10px">\r\n							<a href="http://www.p-etech.loc/index.php?option=com_content&amp;view=article&amp;id=1:etude-de-votre-pret-immobilier&amp;catid=2:non-categorise&amp;Itemid=101#kmt-10" target="_blank" style="display:inline-block;padding:5px 15px;background:#fc0;border:1px solid #caa200;border-bottom-color:#977900;color:#534200;text-shadow:0 1px 0 #ffe684;font-weight:bold;box-shadow:inset 0 1px 0 #ffe064;-moz-box-shadow:inset 0 1px 0 #ffe064;-webkit-box-shadow:inset 0 1px 0 #ffe064;border-radius:2px;moz-border-radius:2px;-webkit-border-radius:2px;text-decoration:none!important">\r\n								View Comment &nbsp; &raquo;							</a>\r\n						</div>\r\n					</td>\r\n				</tr>\r\n			</tbody>\r\n		</table>\r\n\r\n				<p>\r\n			This email was sent to you because you have subscribed to comments update<br />To unsubscribe, <a href="http://www.p-etech.loc/index.php?option=com_komento&task=unsubscribe&id=1" style="color:#477fda">click here</a>.\r\n		</p>\r\n			</center>\r\n\r\n	</div>\r\n</body>\r\n</html>\r\n', '2016-02-01 13:46:39', 'html', 1),
+(6, 'test.admin@site.com', 'Test', 'ddqdd@dsd.com', 'A new comment is posted (Etude de votre prêt immobilier)', '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\r\n<html xmlns="http://www.w3.org/1999/xhtml">\r\n<head>\r\n<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />\r\n<title></title>\r\n</head>\r\n\r\n<body style="margin:0;padding:0;background:#ddd;">\r\n	<div style="width:100%;background:#ddd;margin:0;padding:50px 0 80px;color:#798796;font-family:''Lucida Grande'',Tahoma,Arial;font-size:12px;">\r\n\r\n	<center style="display:block;padding:30px 0">\r\n		<table cellpadding="0" cellspacing="0" border="0" style="width:590px;background:#fff;border:1px solid #b5bbc1;border-bottom-color:#9ba3ab;border-radius:4px;-moz-border-radius:4px;-webkit-border-radius:4px;">\r\n			<tbody>\r\n				<tr>\r\n					<td style="padding:20px;border-bottom:1px solid #b5bbc1;;background:#f5f5f5;border-radius:3px 3px 0 0;-moz-border-radius:3px 3px 0 0;-webkit-border-radius:3px 3px 0 0;">\r\n						Good day dsqdqs,\r\n						<br /><br />\r\n						A new comment is posted on:						<br />\r\n						<a href="http://www.p-etech.loc/index.php?option=com_content&amp;view=article&amp;id=1:etude-de-votre-pret-immobilier&amp;catid=2:non-categorise&amp;Itemid=101" style="font-weight:bold;color:#477fda;text-decoration:none;font-size:16px;line-height:20px">Etude de votre prêt immobilier</a>\r\n						<br />\r\n						<br />\r\n						Below is a snippet from the comment that has been posted.					</td>\r\n				</tr>\r\n				<tr>\r\n					<td style="padding:15px 20px;line-height:1.5;color:#555;font-family:''Lucida Grande'',Tahoma,Arial;font-size:12px;text-align:left">\r\n						<div style="display:inline-block;width:100%;padding-bottom:20px;">\r\n							<img src="http://www.gravatar.com/avatar/616982535852e75220612838970b7a02?s=100&amp;d=identicon" width="50" style="float:left;width:50px;height:auto;border-radius:3px;-moz-border-radius:3px;-webkit-border-radius:3px;" />\r\n							<div style="margin-left:60px">\r\n								<span style="font-weight:bold;color:#477fda;text-decoration:none">Super Utilisateur</span>\r\n								<span style="color:#999">- Posted on lundi, Fév 1 2016 1:45:38pm</span>\r\n								<div style="font-size:12px;margin-top:3px;">\r\n									okd								</div>\r\n							</div>\r\n						</div>\r\n\r\n						<div style="color:#555;clear:both;border-top:1px solid #ddd;padding:20px 0 10px">\r\n							<a href="http://www.p-etech.loc/index.php?option=com_content&amp;view=article&amp;id=1:etude-de-votre-pret-immobilier&amp;catid=2:non-categorise&amp;Itemid=101#kmt-9" target="_blank" style="display:inline-block;padding:5px 15px;background:#fc0;border:1px solid #caa200;border-bottom-color:#977900;color:#534200;text-shadow:0 1px 0 #ffe684;font-weight:bold;box-shadow:inset 0 1px 0 #ffe064;-moz-box-shadow:inset 0 1px 0 #ffe064;-webkit-box-shadow:inset 0 1px 0 #ffe064;border-radius:2px;moz-border-radius:2px;-webkit-border-radius:2px;text-decoration:none!important">\r\n								View Comment &nbsp; &raquo;							</a>\r\n						</div>\r\n					</td>\r\n				</tr>\r\n			</tbody>\r\n		</table>\r\n\r\n				<p>\r\n			This email was sent to you because you have subscribed to comments update<br />To unsubscribe, <a href="http://www.p-etech.loc/index.php?option=com_komento&task=unsubscribe&id=1" style="color:#477fda">click here</a>.\r\n		</p>\r\n			</center>\r\n\r\n	</div>\r\n</body>\r\n</html>\r\n', '2016-02-01 13:46:39', 'html', 1),
+(7, 'test.admin@site.com', 'Test', 'ddqdd@dsd.com', 'A new comment is posted (Etude de votre prêt immobilier)', '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\r\n<html xmlns="http://www.w3.org/1999/xhtml">\r\n<head>\r\n<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />\r\n<title></title>\r\n</head>\r\n\r\n<body style="margin:0;padding:0;background:#ddd;">\r\n	<div style="width:100%;background:#ddd;margin:0;padding:50px 0 80px;color:#798796;font-family:''Lucida Grande'',Tahoma,Arial;font-size:12px;">\r\n\r\n	<center style="display:block;padding:30px 0">\r\n		<table cellpadding="0" cellspacing="0" border="0" style="width:590px;background:#fff;border:1px solid #b5bbc1;border-bottom-color:#9ba3ab;border-radius:4px;-moz-border-radius:4px;-webkit-border-radius:4px;">\r\n			<tbody>\r\n				<tr>\r\n					<td style="padding:20px;border-bottom:1px solid #b5bbc1;;background:#f5f5f5;border-radius:3px 3px 0 0;-moz-border-radius:3px 3px 0 0;-webkit-border-radius:3px 3px 0 0;">\r\n						Good day dsqdqs,\r\n						<br /><br />\r\n						A new comment is posted on:						<br />\r\n						<a href="http://www.p-etech.loc/index.php?option=com_content&amp;view=article&amp;id=1:etude-de-votre-pret-immobilier&amp;catid=2:non-categorise&amp;Itemid=101" style="font-weight:bold;color:#477fda;text-decoration:none;font-size:16px;line-height:20px">Etude de votre prêt immobilier</a>\r\n						<br />\r\n						<br />\r\n						Below is a snippet from the comment that has been posted.					</td>\r\n				</tr>\r\n				<tr>\r\n					<td style="padding:15px 20px;line-height:1.5;color:#555;font-family:''Lucida Grande'',Tahoma,Arial;font-size:12px;text-align:left">\r\n						<div style="display:inline-block;width:100%;padding-bottom:20px;">\r\n							<img src="http://www.gravatar.com/avatar/616982535852e75220612838970b7a02?s=100&amp;d=identicon" width="50" style="float:left;width:50px;height:auto;border-radius:3px;-moz-border-radius:3px;-webkit-border-radius:3px;" />\r\n							<div style="margin-left:60px">\r\n								<span style="font-weight:bold;color:#477fda;text-decoration:none">Super Utilisateur</span>\r\n								<span style="color:#999">- Posted on lundi, Fév 1 2016 1:45:25pm</span>\r\n								<div style="font-size:12px;margin-top:3px;">\r\n									sdd sdsqd qsd qsd								</div>\r\n							</div>\r\n						</div>\r\n\r\n						<div style="color:#555;clear:both;border-top:1px solid #ddd;padding:20px 0 10px">\r\n							<a href="http://www.p-etech.loc/index.php?option=com_content&amp;view=article&amp;id=1:etude-de-votre-pret-immobilier&amp;catid=2:non-categorise&amp;Itemid=101#kmt-8" target="_blank" style="display:inline-block;padding:5px 15px;background:#fc0;border:1px solid #caa200;border-bottom-color:#977900;color:#534200;text-shadow:0 1px 0 #ffe684;font-weight:bold;box-shadow:inset 0 1px 0 #ffe064;-moz-box-shadow:inset 0 1px 0 #ffe064;-webkit-box-shadow:inset 0 1px 0 #ffe064;border-radius:2px;moz-border-radius:2px;-webkit-border-radius:2px;text-decoration:none!important">\r\n								View Comment &nbsp; &raquo;							</a>\r\n						</div>\r\n					</td>\r\n				</tr>\r\n			</tbody>\r\n		</table>\r\n\r\n				<p>\r\n			This email was sent to you because you have subscribed to comments update<br />To unsubscribe, <a href="http://www.p-etech.loc/index.php?option=com_komento&task=unsubscribe&id=1" style="color:#477fda">click here</a>.\r\n		</p>\r\n			</center>\r\n\r\n	</div>\r\n</body>\r\n</html>\r\n', '2016-02-01 13:46:39', 'html', 1),
+(8, 'test.admin@site.com', 'Test', 'ddqdd@dsd.com', 'A new comment is posted (Etude de votre prêt immobilier)', '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\r\n<html xmlns="http://www.w3.org/1999/xhtml">\r\n<head>\r\n<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />\r\n<title></title>\r\n</head>\r\n\r\n<body style="margin:0;padding:0;background:#ddd;">\r\n	<div style="width:100%;background:#ddd;margin:0;padding:50px 0 80px;color:#798796;font-family:''Lucida Grande'',Tahoma,Arial;font-size:12px;">\r\n\r\n	<center style="display:block;padding:30px 0">\r\n		<table cellpadding="0" cellspacing="0" border="0" style="width:590px;background:#fff;border:1px solid #b5bbc1;border-bottom-color:#9ba3ab;border-radius:4px;-moz-border-radius:4px;-webkit-border-radius:4px;">\r\n			<tbody>\r\n				<tr>\r\n					<td style="padding:20px;border-bottom:1px solid #b5bbc1;;background:#f5f5f5;border-radius:3px 3px 0 0;-moz-border-radius:3px 3px 0 0;-webkit-border-radius:3px 3px 0 0;">\r\n						Good day dsqdqs,\r\n						<br /><br />\r\n						A new comment is posted on:						<br />\r\n						<a href="http://www.p-etech.loc/index.php?option=com_content&amp;view=article&amp;id=1:etude-de-votre-pret-immobilier&amp;catid=2:non-categorise&amp;Itemid=101" style="font-weight:bold;color:#477fda;text-decoration:none;font-size:16px;line-height:20px">Etude de votre prêt immobilier</a>\r\n						<br />\r\n						<br />\r\n						Below is a snippet from the comment that has been posted.					</td>\r\n				</tr>\r\n				<tr>\r\n					<td style="padding:15px 20px;line-height:1.5;color:#555;font-family:''Lucida Grande'',Tahoma,Arial;font-size:12px;text-align:left">\r\n						<div style="display:inline-block;width:100%;padding-bottom:20px;">\r\n							<img src="http://www.gravatar.com/avatar/616982535852e75220612838970b7a02?s=100&amp;d=identicon" width="50" style="float:left;width:50px;height:auto;border-radius:3px;-moz-border-radius:3px;-webkit-border-radius:3px;" />\r\n							<div style="margin-left:60px">\r\n								<span style="font-weight:bold;color:#477fda;text-decoration:none">Super Utilisateur</span>\r\n								<span style="color:#999">- Posted on lundi, Fév 1 2016 1:45:03pm</span>\r\n								<div style="font-size:12px;margin-top:3px;">\r\n									asd dqsd q								</div>\r\n							</div>\r\n						</div>\r\n\r\n						<div style="color:#555;clear:both;border-top:1px solid #ddd;padding:20px 0 10px">\r\n							<a href="http://www.p-etech.loc/index.php?option=com_content&amp;view=article&amp;id=1:etude-de-votre-pret-immobilier&amp;catid=2:non-categorise&amp;Itemid=101#kmt-7" target="_blank" style="display:inline-block;padding:5px 15px;background:#fc0;border:1px solid #caa200;border-bottom-color:#977900;color:#534200;text-shadow:0 1px 0 #ffe684;font-weight:bold;box-shadow:inset 0 1px 0 #ffe064;-moz-box-shadow:inset 0 1px 0 #ffe064;-webkit-box-shadow:inset 0 1px 0 #ffe064;border-radius:2px;moz-border-radius:2px;-webkit-border-radius:2px;text-decoration:none!important">\r\n								View Comment &nbsp; &raquo;							</a>\r\n						</div>\r\n					</td>\r\n				</tr>\r\n			</tbody>\r\n		</table>\r\n\r\n				<p>\r\n			This email was sent to you because you have subscribed to comments update<br />To unsubscribe, <a href="http://www.p-etech.loc/index.php?option=com_komento&task=unsubscribe&id=1" style="color:#477fda">click here</a>.\r\n		</p>\r\n			</center>\r\n\r\n	</div>\r\n</body>\r\n</html>\r\n', '2016-02-01 13:46:39', 'html', 1),
+(9, 'test.admin@site.com', 'Test', 'ddqdd@dsd.com', 'A new comment is posted (Etude de votre prêt immobilier)', '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\r\n<html xmlns="http://www.w3.org/1999/xhtml">\r\n<head>\r\n<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />\r\n<title></title>\r\n</head>\r\n\r\n<body style="margin:0;padding:0;background:#ddd;">\r\n	<div style="width:100%;background:#ddd;margin:0;padding:50px 0 80px;color:#798796;font-family:''Lucida Grande'',Tahoma,Arial;font-size:12px;">\r\n\r\n	<center style="display:block;padding:30px 0">\r\n		<table cellpadding="0" cellspacing="0" border="0" style="width:590px;background:#fff;border:1px solid #b5bbc1;border-bottom-color:#9ba3ab;border-radius:4px;-moz-border-radius:4px;-webkit-border-radius:4px;">\r\n			<tbody>\r\n				<tr>\r\n					<td style="padding:20px;border-bottom:1px solid #b5bbc1;;background:#f5f5f5;border-radius:3px 3px 0 0;-moz-border-radius:3px 3px 0 0;-webkit-border-radius:3px 3px 0 0;">\r\n						Good day dsqdqs,\r\n						<br /><br />\r\n						A new comment is posted on:						<br />\r\n						<a href="http://www.p-etech.loc/index.php?option=com_content&amp;view=article&amp;id=1:etude-de-votre-pret-immobilier&amp;catid=2:non-categorise&amp;Itemid=101" style="font-weight:bold;color:#477fda;text-decoration:none;font-size:16px;line-height:20px">Etude de votre prêt immobilier</a>\r\n						<br />\r\n						<br />\r\n						Below is a snippet from the comment that has been posted.					</td>\r\n				</tr>\r\n				<tr>\r\n					<td style="padding:15px 20px;line-height:1.5;color:#555;font-family:''Lucida Grande'',Tahoma,Arial;font-size:12px;text-align:left">\r\n						<div style="display:inline-block;width:100%;padding-bottom:20px;">\r\n							<img src="http://www.gravatar.com/avatar/616982535852e75220612838970b7a02?s=100&amp;d=identicon" width="50" style="float:left;width:50px;height:auto;border-radius:3px;-moz-border-radius:3px;-webkit-border-radius:3px;" />\r\n							<div style="margin-left:60px">\r\n								<span style="font-weight:bold;color:#477fda;text-decoration:none">Super Utilisateur</span>\r\n								<span style="color:#999">- Posted on samedi, Jan 30 2016 3:55:41pm</span>\r\n								<div style="font-size:12px;margin-top:3px;">\r\n									teststsdsd qs qdq ssqdqsdqs								</div>\r\n							</div>\r\n						</div>\r\n\r\n						<div style="color:#555;clear:both;border-top:1px solid #ddd;padding:20px 0 10px">\r\n							<a href="http://www.p-etech.loc/index.php?option=com_content&amp;view=article&amp;id=1:etude-de-votre-pret-immobilier&amp;catid=2:non-categorise&amp;Itemid=101#kmt-6" target="_blank" style="display:inline-block;padding:5px 15px;background:#fc0;border:1px solid #caa200;border-bottom-color:#977900;color:#534200;text-shadow:0 1px 0 #ffe684;font-weight:bold;box-shadow:inset 0 1px 0 #ffe064;-moz-box-shadow:inset 0 1px 0 #ffe064;-webkit-box-shadow:inset 0 1px 0 #ffe064;border-radius:2px;moz-border-radius:2px;-webkit-border-radius:2px;text-decoration:none!important">\r\n								View Comment &nbsp; &raquo;							</a>\r\n						</div>\r\n					</td>\r\n				</tr>\r\n			</tbody>\r\n		</table>\r\n\r\n				<p>\r\n			This email was sent to you because you have subscribed to comments update<br />To unsubscribe, <a href="http://www.p-etech.loc/index.php?option=com_komento&task=unsubscribe&id=1" style="color:#477fda">click here</a>.\r\n		</p>\r\n			</center>\r\n\r\n	</div>\r\n</body>\r\n</html>\r\n', '2016-02-01 13:46:39', 'html', 1),
+(10, 'test.admin@site.com', 'Test', 'ddqdd@dsd.com', 'A new comment is posted (Etude de votre prêt immobilier)', '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\r\n<html xmlns="http://www.w3.org/1999/xhtml">\r\n<head>\r\n<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />\r\n<title></title>\r\n</head>\r\n\r\n<body style="margin:0;padding:0;background:#ddd;">\r\n	<div style="width:100%;background:#ddd;margin:0;padding:50px 0 80px;color:#798796;font-family:''Lucida Grande'',Tahoma,Arial;font-size:12px;">\r\n\r\n	<center style="display:block;padding:30px 0">\r\n		<table cellpadding="0" cellspacing="0" border="0" style="width:590px;background:#fff;border:1px solid #b5bbc1;border-bottom-color:#9ba3ab;border-radius:4px;-moz-border-radius:4px;-webkit-border-radius:4px;">\r\n			<tbody>\r\n				<tr>\r\n					<td style="padding:20px;border-bottom:1px solid #b5bbc1;;background:#f5f5f5;border-radius:3px 3px 0 0;-moz-border-radius:3px 3px 0 0;-webkit-border-radius:3px 3px 0 0;">\r\n						Good day dsqdqs,\r\n						<br /><br />\r\n						A new comment is posted on:						<br />\r\n						<a href="http://www.p-etech.loc/index.php?option=com_content&amp;view=article&amp;id=1:etude-de-votre-pret-immobilier&amp;catid=2:non-categorise&amp;Itemid=101" style="font-weight:bold;color:#477fda;text-decoration:none;font-size:16px;line-height:20px">Etude de votre prêt immobilier</a>\r\n						<br />\r\n						<br />\r\n						Below is a snippet from the comment that has been posted.					</td>\r\n				</tr>\r\n				<tr>\r\n					<td style="padding:15px 20px;line-height:1.5;color:#555;font-family:''Lucida Grande'',Tahoma,Arial;font-size:12px;text-align:left">\r\n						<div style="display:inline-block;width:100%;padding-bottom:20px;">\r\n							<img src="http://www.gravatar.com/avatar/616982535852e75220612838970b7a02?s=100&amp;d=identicon" width="50" style="float:left;width:50px;height:auto;border-radius:3px;-moz-border-radius:3px;-webkit-border-radius:3px;" />\r\n							<div style="margin-left:60px">\r\n								<span style="font-weight:bold;color:#477fda;text-decoration:none">Super Utilisateur</span>\r\n								<span style="color:#999">- Posted on samedi, Jan 30 2016 3:33:56pm</span>\r\n								<div style="font-size:12px;margin-top:3px;">\r\n									qd dq dqsdqdq								</div>\r\n							</div>\r\n						</div>\r\n\r\n						<div style="color:#555;clear:both;border-top:1px solid #ddd;padding:20px 0 10px">\r\n							<a href="http://www.p-etech.loc/index.php?option=com_content&amp;view=article&amp;id=1:etude-de-votre-pret-immobilier&amp;catid=2:non-categorise&amp;Itemid=101#kmt-5" target="_blank" style="display:inline-block;padding:5px 15px;background:#fc0;border:1px solid #caa200;border-bottom-color:#977900;color:#534200;text-shadow:0 1px 0 #ffe684;font-weight:bold;box-shadow:inset 0 1px 0 #ffe064;-moz-box-shadow:inset 0 1px 0 #ffe064;-webkit-box-shadow:inset 0 1px 0 #ffe064;border-radius:2px;moz-border-radius:2px;-webkit-border-radius:2px;text-decoration:none!important">\r\n								View Comment &nbsp; &raquo;							</a>\r\n						</div>\r\n					</td>\r\n				</tr>\r\n			</tbody>\r\n		</table>\r\n\r\n				<p>\r\n			This email was sent to you because you have subscribed to comments update<br />To unsubscribe, <a href="http://www.p-etech.loc/index.php?option=com_komento&task=unsubscribe&id=1" style="color:#477fda">click here</a>.\r\n		</p>\r\n			</center>\r\n\r\n	</div>\r\n</body>\r\n</html>\r\n', '2016-02-01 13:46:39', 'html', 1);
 
 -- --------------------------------------------------------
 
@@ -1415,17 +1847,19 @@ INSERT INTO `x8n17_komento_mailq` (`id`, `mailfrom`, `fromname`, `recipient`, `s
 -- Structure de la table `x8n17_komento_subscription`
 --
 
-CREATE TABLE `x8n17_komento_subscription` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_komento_subscription` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `type` varchar(20) NOT NULL,
   `component` varchar(255) NOT NULL,
-  `cid` bigint(20) UNSIGNED NOT NULL,
-  `userid` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
+  `cid` bigint(20) unsigned NOT NULL,
+  `userid` bigint(20) unsigned NOT NULL DEFAULT '0',
   `fullname` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `published` tinyint(1) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `published` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `komento_subscription` (`type`,`component`,`cid`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 --
 -- Contenu de la table `x8n17_komento_subscription`
@@ -1441,18 +1875,19 @@ INSERT INTO `x8n17_komento_subscription` (`id`, `type`, `component`, `cid`, `use
 -- Structure de la table `x8n17_komento_uploads`
 --
 
-CREATE TABLE `x8n17_komento_uploads` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_komento_uploads` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) DEFAULT NULL,
   `filename` text NOT NULL,
   `hashname` text NOT NULL,
   `path` text,
   `created` datetime NOT NULL,
-  `created_by` bigint(20) UNSIGNED DEFAULT '0',
+  `created_by` bigint(20) unsigned DEFAULT '0',
   `published` tinyint(1) NOT NULL,
   `mime` text NOT NULL,
-  `size` text NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  `size` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -1460,8 +1895,8 @@ CREATE TABLE `x8n17_komento_uploads` (
 -- Structure de la table `x8n17_languages`
 --
 
-CREATE TABLE `x8n17_languages` (
-  `lang_id` int(11) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_languages` (
+  `lang_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `lang_code` char(7) NOT NULL,
   `title` varchar(50) NOT NULL,
   `title_native` varchar(50) NOT NULL,
@@ -1472,9 +1907,15 @@ CREATE TABLE `x8n17_languages` (
   `metadesc` text NOT NULL,
   `sitename` varchar(1024) NOT NULL DEFAULT '',
   `published` int(11) NOT NULL DEFAULT '0',
-  `access` int(10) UNSIGNED NOT NULL DEFAULT '0',
-  `ordering` int(11) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `access` int(10) unsigned NOT NULL DEFAULT '0',
+  `ordering` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`lang_id`),
+  UNIQUE KEY `idx_sef` (`sef`),
+  UNIQUE KEY `idx_image` (`image`),
+  UNIQUE KEY `idx_langcode` (`lang_code`),
+  KEY `idx_access` (`access`),
+  KEY `idx_ordering` (`ordering`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 --
 -- Contenu de la table `x8n17_languages`
@@ -1490,8 +1931,8 @@ INSERT INTO `x8n17_languages` (`lang_id`, `lang_code`, `title`, `title_native`, 
 -- Structure de la table `x8n17_menu`
 --
 
-CREATE TABLE `x8n17_menu` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_menu` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `menutype` varchar(24) NOT NULL COMMENT 'The type of menu this item belongs to. FK to #__menu_types.menutype',
   `title` varchar(255) NOT NULL COMMENT 'The display title of the menu item.',
   `alias` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'The SEF alias of the menu item.',
@@ -1500,29 +1941,37 @@ CREATE TABLE `x8n17_menu` (
   `link` varchar(1024) NOT NULL COMMENT 'The actually link the menu item refers to.',
   `type` varchar(16) NOT NULL COMMENT 'The type of link: Component, URL, Alias, Separator',
   `published` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'The published state of the menu link.',
-  `parent_id` int(10) UNSIGNED NOT NULL DEFAULT '1' COMMENT 'The parent menu item in the menu tree.',
-  `level` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'The relative level in the tree.',
-  `component_id` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'FK to #__extensions.id',
-  `checked_out` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'FK to #__users.id',
+  `parent_id` int(10) unsigned NOT NULL DEFAULT '1' COMMENT 'The parent menu item in the menu tree.',
+  `level` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'The relative level in the tree.',
+  `component_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'FK to #__extensions.id',
+  `checked_out` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'FK to #__users.id',
   `checked_out_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'The time the menu item was checked out.',
   `browserNav` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'The click behaviour of the link.',
-  `access` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'The access level required to view the menu item.',
+  `access` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'The access level required to view the menu item.',
   `img` varchar(255) NOT NULL COMMENT 'The image of the menu item.',
-  `template_style_id` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `template_style_id` int(10) unsigned NOT NULL DEFAULT '0',
   `params` text NOT NULL COMMENT 'JSON encoded data for the menu item.',
   `lft` int(11) NOT NULL DEFAULT '0' COMMENT 'Nested set lft.',
   `rgt` int(11) NOT NULL DEFAULT '0' COMMENT 'Nested set rgt.',
-  `home` tinyint(3) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Indicates if this menu item is the home or default page.',
+  `home` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT 'Indicates if this menu item is the home or default page.',
   `language` char(7) NOT NULL DEFAULT '',
-  `client_id` tinyint(4) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `client_id` tinyint(4) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_client_id_parent_id_alias_language` (`client_id`,`parent_id`,`alias`,`language`),
+  KEY `idx_componentid` (`component_id`,`menutype`,`published`,`access`),
+  KEY `idx_menutype` (`menutype`),
+  KEY `idx_left_right` (`lft`,`rgt`),
+  KEY `idx_alias` (`alias`),
+  KEY `idx_path` (`path`(255)),
+  KEY `idx_language` (`language`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=150 ;
 
 --
 -- Contenu de la table `x8n17_menu`
 --
 
 INSERT INTO `x8n17_menu` (`id`, `menutype`, `title`, `alias`, `note`, `path`, `link`, `type`, `published`, `parent_id`, `level`, `component_id`, `checked_out`, `checked_out_time`, `browserNav`, `access`, `img`, `template_style_id`, `params`, `lft`, `rgt`, `home`, `language`, `client_id`) VALUES
-(1, '', 'Menu_Item_Root', 'root', '', '', '', '', 1, 0, 0, 0, 0, '0000-00-00 00:00:00', 0, 0, '', 0, '', 0, 73, 0, '*', 0),
+(1, '', 'Menu_Item_Root', 'root', '', '', '', '', 1, 0, 0, 0, 0, '0000-00-00 00:00:00', 0, 0, '', 0, '', 0, 105, 0, '*', 0),
 (2, 'menu', 'com_banners', 'Banners', '', 'Banners', 'index.php?option=com_banners', 'component', 0, 1, 1, 4, 0, '0000-00-00 00:00:00', 0, 0, 'class:banners', 0, '', 1, 10, 0, '*', 1),
 (3, 'menu', 'com_banners', 'Banners', '', 'Banners/Banners', 'index.php?option=com_banners', 'component', 0, 2, 2, 4, 0, '0000-00-00 00:00:00', 0, 0, 'class:banners', 0, '', 2, 3, 0, '*', 1),
 (4, 'menu', 'com_banners_categories', 'Categories', '', 'Banners/Categories', 'index.php?option=com_categories&extension=com_banners', 'component', 0, 2, 2, 6, 0, '0000-00-00 00:00:00', 0, 0, 'class:banners-cat', 0, '', 4, 5, 0, '*', 1),
@@ -1558,7 +2007,23 @@ INSERT INTO `x8n17_menu` (`id`, `menutype`, `title`, `alias`, `note`, `path`, `l
 (124, 'main', 'COM_KOMENTO_MENU_CONFIGURATION', 'com-komento-menu-configuration', '', 'komento/com-komento-menu-configuration', 'index.php?option=com_komento&view=system', 'component', 0, 118, 2, 10015, 0, '0000-00-00 00:00:00', 0, 1, 'components/com_komento/assets/images/system-favicon.png', 0, '{}', 64, 65, 0, '', 1),
 (125, 'main', 'COM_KOMENTO_MENU_ACL', 'com-komento-menu-acl', '', 'komento/com-komento-menu-acl', 'index.php?option=com_komento&view=acl', 'component', 0, 118, 2, 10015, 0, '0000-00-00 00:00:00', 0, 1, 'components/com_komento/assets/images/acls-favicon.png', 0, '{}', 66, 67, 0, '', 1),
 (126, 'main', 'COM_KOMENTO_MENU_MIGRATORS', 'com-komento-menu-migrators', '', 'komento/com-komento-menu-migrators', 'index.php?option=com_komento&view=migrators', 'component', 0, 118, 2, 10015, 0, '0000-00-00 00:00:00', 0, 1, 'components/com_komento/assets/images/migrators-favicon.png', 0, '{}', 68, 69, 0, '', 1),
-(127, 'main', 'COM_KOMENTO_MENU_MAILQ', 'com-komento-menu-mailq', '', 'komento/com-komento-menu-mailq', 'index.php?option=com_komento&view=mailq', 'component', 0, 118, 2, 10015, 0, '0000-00-00 00:00:00', 0, 1, 'components/com_komento/assets/images/mailq-favicon.png', 0, '{}', 70, 71, 0, '', 1);
+(127, 'main', 'COM_KOMENTO_MENU_MAILQ', 'com-komento-menu-mailq', '', 'komento/com-komento-menu-mailq', 'index.php?option=com_komento&view=mailq', 'component', 0, 118, 2, 10015, 0, '0000-00-00 00:00:00', 0, 1, 'components/com_komento/assets/images/mailq-favicon.png', 0, '{}', 70, 71, 0, '', 1),
+(128, 'main', 'JDeveloper', 'jdeveloper', '', 'jdeveloper', 'index.php?option=com_jdeveloper', 'component', 0, 1, 1, 10022, 0, '0000-00-00 00:00:00', 0, 1, 'class:component', 0, '{}', 73, 98, 0, '', 1),
+(129, 'main', 'JDeveloper', 'jdeveloper', '', 'jdeveloper/jdeveloper', 'index.php?option=com_jdeveloper&view=cpanel', 'component', 0, 128, 2, 10022, 0, '0000-00-00 00:00:00', 0, 1, 'class:component', 0, '{}', 74, 75, 0, '', 1),
+(130, 'main', 'Components', 'components', '', 'jdeveloper/components', 'index.php?option=com_jdeveloper&view=components', 'component', 0, 128, 2, 10022, 0, '0000-00-00 00:00:00', 0, 1, 'class:component', 0, '{}', 76, 77, 0, '', 1),
+(131, 'main', 'Modules', 'modules', '', 'jdeveloper/modules', 'index.php?option=com_jdeveloper&view=modules', 'component', 0, 128, 2, 10022, 0, '0000-00-00 00:00:00', 0, 1, 'class:component', 0, '{}', 78, 79, 0, '', 1),
+(132, 'main', 'Templates', 'templates', '', 'jdeveloper/templates', 'index.php?option=com_jdeveloper&view=templates', 'component', 0, 128, 2, 10022, 0, '0000-00-00 00:00:00', 0, 1, 'class:component', 0, '{}', 80, 81, 0, '', 1),
+(133, 'main', 'Plugins', 'plugins', '', 'jdeveloper/plugins', 'index.php?option=com_jdeveloper&view=plugins', 'component', 0, 128, 2, 10022, 0, '0000-00-00 00:00:00', 0, 1, 'class:component', 0, '{}', 82, 83, 0, '', 1),
+(134, 'main', 'Packages', 'packages', '', 'jdeveloper/packages', 'index.php?option=com_jdeveloper&view=packages', 'component', 0, 128, 2, 10022, 0, '0000-00-00 00:00:00', 0, 1, 'class:component', 0, '{}', 84, 85, 0, '', 1),
+(135, 'main', 'Libraries', 'libraries', '', 'jdeveloper/libraries', 'index.php?option=com_jdeveloper&view=libraries', 'component', 0, 128, 2, 10022, 0, '0000-00-00 00:00:00', 0, 1, 'class:component', 0, '{}', 86, 87, 0, '', 1),
+(136, 'main', 'Forms', 'forms', '', 'jdeveloper/forms', 'index.php?option=com_jdeveloper&view=forms', 'component', 0, 128, 2, 10022, 0, '0000-00-00 00:00:00', 0, 1, 'class:component', 0, '{}', 88, 89, 0, '', 1),
+(137, 'main', 'Formfields', 'formfields', '', 'jdeveloper/formfields', 'index.php?option=com_jdeveloper&view=formfields', 'component', 0, 128, 2, 10022, 0, '0000-00-00 00:00:00', 0, 1, 'class:component', 0, '{}', 90, 91, 0, '', 1),
+(138, 'main', 'Formrules', 'formrules', '', 'jdeveloper/formrules', 'index.php?option=com_jdeveloper&view=formrules', 'component', 0, 128, 2, 10022, 0, '0000-00-00 00:00:00', 0, 1, 'class:component', 0, '{}', 92, 93, 0, '', 1),
+(139, 'main', 'Extensions', 'extensions', '', 'jdeveloper/extensions', 'index.php?option=com_jdeveloper&view=extensions', 'component', 0, 128, 2, 10022, 0, '0000-00-00 00:00:00', 0, 1, 'class:component', 0, '{}', 94, 95, 0, '', 1),
+(140, 'main', 'Import', 'import', '', 'jdeveloper/import', 'index.php?option=com_jdeveloper&view=import', 'component', 0, 128, 2, 10022, 0, '0000-00-00 00:00:00', 0, 1, 'class:component', 0, '{}', 96, 97, 0, '', 1),
+(147, 'main', 'Rssfeed', 'rssfeed', '', 'rssfeed', 'index.php?option=com_rssfeed', 'component', 0, 1, 1, 10027, 0, '0000-00-00 00:00:00', 0, 1, 'class:component', 0, '{}', 99, 104, 0, '', 1),
+(148, 'main', 'Feedss', 'feedss', '', 'rssfeed/feedss', 'index.php?option=com_rssfeed&view=feedss', 'component', 0, 147, 2, 10027, 0, '0000-00-00 00:00:00', 0, 1, 'class:component', 0, '{}', 100, 101, 0, '', 1),
+(149, 'main', 'JCATEGORIES', 'jcategories', '', 'rssfeed/jcategories', 'index.php?option=com_categories&view=categories&extension=com_rssfeed', 'component', 0, 147, 2, 10027, 0, '0000-00-00 00:00:00', 0, 1, 'class:component', 0, '{}', 102, 103, 0, '', 1);
 
 -- --------------------------------------------------------
 
@@ -1566,12 +2031,14 @@ INSERT INTO `x8n17_menu` (`id`, `menutype`, `title`, `alias`, `note`, `path`, `l
 -- Structure de la table `x8n17_menu_types`
 --
 
-CREATE TABLE `x8n17_menu_types` (
-  `id` int(10) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_menu_types` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `menutype` varchar(24) NOT NULL,
   `title` varchar(48) NOT NULL,
-  `description` varchar(255) NOT NULL DEFAULT ''
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `description` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_menutype` (`menutype`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 --
 -- Contenu de la table `x8n17_menu_types`
@@ -1587,17 +2054,19 @@ INSERT INTO `x8n17_menu_types` (`id`, `menutype`, `title`, `description`) VALUES
 -- Structure de la table `x8n17_messages`
 --
 
-CREATE TABLE `x8n17_messages` (
-  `message_id` int(10) UNSIGNED NOT NULL,
-  `user_id_from` int(10) UNSIGNED NOT NULL DEFAULT '0',
-  `user_id_to` int(10) UNSIGNED NOT NULL DEFAULT '0',
-  `folder_id` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
+CREATE TABLE IF NOT EXISTS `x8n17_messages` (
+  `message_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id_from` int(10) unsigned NOT NULL DEFAULT '0',
+  `user_id_to` int(10) unsigned NOT NULL DEFAULT '0',
+  `folder_id` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `date_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `state` tinyint(1) NOT NULL DEFAULT '0',
-  `priority` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+  `priority` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `subject` varchar(255) NOT NULL DEFAULT '',
-  `message` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `message` text NOT NULL,
+  PRIMARY KEY (`message_id`),
+  KEY `useridto_state` (`user_id_to`,`state`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -1605,10 +2074,11 @@ CREATE TABLE `x8n17_messages` (
 -- Structure de la table `x8n17_messages_cfg`
 --
 
-CREATE TABLE `x8n17_messages_cfg` (
-  `user_id` int(10) UNSIGNED NOT NULL DEFAULT '0',
+CREATE TABLE IF NOT EXISTS `x8n17_messages_cfg` (
+  `user_id` int(10) unsigned NOT NULL DEFAULT '0',
   `cfg_name` varchar(100) NOT NULL DEFAULT '',
-  `cfg_value` varchar(255) NOT NULL DEFAULT ''
+  `cfg_value` varchar(255) NOT NULL DEFAULT '',
+  UNIQUE KEY `idx_user_var_name` (`user_id`,`cfg_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -1617,26 +2087,30 @@ CREATE TABLE `x8n17_messages_cfg` (
 -- Structure de la table `x8n17_modules`
 --
 
-CREATE TABLE `x8n17_modules` (
-  `id` int(11) NOT NULL,
-  `asset_id` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'FK to the #__assets table.',
+CREATE TABLE IF NOT EXISTS `x8n17_modules` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `asset_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'FK to the #__assets table.',
   `title` varchar(100) NOT NULL DEFAULT '',
   `note` varchar(255) NOT NULL DEFAULT '',
   `content` text NOT NULL,
   `ordering` int(11) NOT NULL DEFAULT '0',
   `position` varchar(50) NOT NULL DEFAULT '',
-  `checked_out` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `checked_out` int(10) unsigned NOT NULL DEFAULT '0',
   `checked_out_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `publish_up` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `publish_down` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `published` tinyint(1) NOT NULL DEFAULT '0',
   `module` varchar(50) DEFAULT NULL,
-  `access` int(10) UNSIGNED NOT NULL DEFAULT '0',
-  `showtitle` tinyint(3) UNSIGNED NOT NULL DEFAULT '1',
+  `access` int(10) unsigned NOT NULL DEFAULT '0',
+  `showtitle` tinyint(3) unsigned NOT NULL DEFAULT '1',
   `params` text NOT NULL,
   `client_id` tinyint(4) NOT NULL DEFAULT '0',
-  `language` char(7) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `language` char(7) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `published` (`published`,`access`),
+  KEY `newsfeeds` (`module`,`published`),
+  KEY `idx_language` (`language`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=102 ;
 
 --
 -- Contenu de la table `x8n17_modules`
@@ -1678,9 +2152,10 @@ INSERT INTO `x8n17_modules` (`id`, `asset_id`, `title`, `note`, `content`, `orde
 -- Structure de la table `x8n17_modules_menu`
 --
 
-CREATE TABLE `x8n17_modules_menu` (
+CREATE TABLE IF NOT EXISTS `x8n17_modules_menu` (
   `moduleid` int(11) NOT NULL DEFAULT '0',
-  `menuid` int(11) NOT NULL DEFAULT '0'
+  `menuid` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`moduleid`,`menuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1724,27 +2199,27 @@ INSERT INTO `x8n17_modules_menu` (`moduleid`, `menuid`) VALUES
 -- Structure de la table `x8n17_newsfeeds`
 --
 
-CREATE TABLE `x8n17_newsfeeds` (
+CREATE TABLE IF NOT EXISTS `x8n17_newsfeeds` (
   `catid` int(11) NOT NULL DEFAULT '0',
-  `id` int(10) UNSIGNED NOT NULL,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL DEFAULT '',
   `alias` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
   `link` varchar(200) NOT NULL DEFAULT '',
   `published` tinyint(1) NOT NULL DEFAULT '0',
-  `numarticles` int(10) UNSIGNED NOT NULL DEFAULT '1',
-  `cache_time` int(10) UNSIGNED NOT NULL DEFAULT '3600',
-  `checked_out` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `numarticles` int(10) unsigned NOT NULL DEFAULT '1',
+  `cache_time` int(10) unsigned NOT NULL DEFAULT '3600',
+  `checked_out` int(10) unsigned NOT NULL DEFAULT '0',
   `checked_out_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `ordering` int(11) NOT NULL DEFAULT '0',
   `rtl` tinyint(4) NOT NULL DEFAULT '0',
-  `access` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `access` int(10) unsigned NOT NULL DEFAULT '0',
   `language` char(7) NOT NULL DEFAULT '',
   `params` text NOT NULL,
   `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `created_by` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `created_by` int(10) unsigned NOT NULL DEFAULT '0',
   `created_by_alias` varchar(255) NOT NULL DEFAULT '',
   `modified` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `modified_by` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `modified_by` int(10) unsigned NOT NULL DEFAULT '0',
   `metakey` text NOT NULL,
   `metadesc` text NOT NULL,
   `metadata` text NOT NULL,
@@ -1752,10 +2227,18 @@ CREATE TABLE `x8n17_newsfeeds` (
   `publish_up` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `publish_down` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `description` text NOT NULL,
-  `version` int(10) UNSIGNED NOT NULL DEFAULT '1',
-  `hits` int(10) UNSIGNED NOT NULL DEFAULT '0',
-  `images` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `version` int(10) unsigned NOT NULL DEFAULT '1',
+  `hits` int(10) unsigned NOT NULL DEFAULT '0',
+  `images` text NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_access` (`access`),
+  KEY `idx_checkout` (`checked_out`),
+  KEY `idx_state` (`published`),
+  KEY `idx_catid` (`catid`),
+  KEY `idx_createdby` (`created_by`),
+  KEY `idx_language` (`language`),
+  KEY `idx_xreference` (`xreference`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -1763,12 +2246,13 @@ CREATE TABLE `x8n17_newsfeeds` (
 -- Structure de la table `x8n17_overrider`
 --
 
-CREATE TABLE `x8n17_overrider` (
-  `id` int(10) NOT NULL COMMENT 'Primary Key',
+CREATE TABLE IF NOT EXISTS `x8n17_overrider` (
+  `id` int(10) NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
   `constant` varchar(255) NOT NULL,
   `string` text NOT NULL,
-  `file` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `file` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -1776,8 +2260,8 @@ CREATE TABLE `x8n17_overrider` (
 -- Structure de la table `x8n17_postinstall_messages`
 --
 
-CREATE TABLE `x8n17_postinstall_messages` (
-  `postinstall_message_id` bigint(20) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_postinstall_messages` (
+  `postinstall_message_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `extension_id` bigint(20) NOT NULL DEFAULT '700' COMMENT 'FK to #__extensions',
   `title_key` varchar(255) NOT NULL DEFAULT '' COMMENT 'Lang key for the title',
   `description_key` varchar(255) NOT NULL DEFAULT '' COMMENT 'Lang key for description',
@@ -1790,8 +2274,9 @@ CREATE TABLE `x8n17_postinstall_messages` (
   `condition_file` varchar(255) DEFAULT NULL COMMENT 'RAD URI to file holding display condition method',
   `condition_method` varchar(255) DEFAULT NULL COMMENT 'Display condition method, must return boolean',
   `version_introduced` varchar(50) NOT NULL DEFAULT '3.2.0' COMMENT 'Version when this message was introduced',
-  `enabled` tinyint(3) NOT NULL DEFAULT '1'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `enabled` tinyint(3) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`postinstall_message_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 --
 -- Contenu de la table `x8n17_postinstall_messages`
@@ -1807,18 +2292,21 @@ INSERT INTO `x8n17_postinstall_messages` (`postinstall_message_id`, `extension_i
 -- Structure de la table `x8n17_redirect_links`
 --
 
-CREATE TABLE `x8n17_redirect_links` (
-  `id` int(10) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_redirect_links` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `old_url` varchar(255) NOT NULL,
   `new_url` varchar(255) DEFAULT NULL,
   `referer` varchar(150) NOT NULL,
   `comment` varchar(255) NOT NULL,
-  `hits` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `hits` int(10) unsigned NOT NULL DEFAULT '0',
   `published` tinyint(4) NOT NULL,
   `created_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `modified_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `header` smallint(3) NOT NULL DEFAULT '301'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `header` smallint(3) NOT NULL DEFAULT '301',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_link_old` (`old_url`),
+  KEY `idx_link_modifed` (`modified_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -1826,9 +2314,10 @@ CREATE TABLE `x8n17_redirect_links` (
 -- Structure de la table `x8n17_schemas`
 --
 
-CREATE TABLE `x8n17_schemas` (
+CREATE TABLE IF NOT EXISTS `x8n17_schemas` (
   `extension_id` int(11) NOT NULL,
-  `version_id` varchar(20) NOT NULL
+  `version_id` varchar(20) NOT NULL,
+  PRIMARY KEY (`extension_id`,`version_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1837,7 +2326,9 @@ CREATE TABLE `x8n17_schemas` (
 
 INSERT INTO `x8n17_schemas` (`extension_id`, `version_id`) VALUES
 (700, '3.4.0-2015-02-26'),
-(10015, 'install.mysql.utf8');
+(10015, 'install.mysql.utf8'),
+(10022, '3.10.2.1'),
+(10027, '1.0.0');
 
 -- --------------------------------------------------------
 
@@ -1845,15 +2336,26 @@ INSERT INTO `x8n17_schemas` (`extension_id`, `version_id`) VALUES
 -- Structure de la table `x8n17_session`
 --
 
-CREATE TABLE `x8n17_session` (
+CREATE TABLE IF NOT EXISTS `x8n17_session` (
   `session_id` varchar(200) NOT NULL DEFAULT '',
-  `client_id` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
-  `guest` tinyint(4) UNSIGNED DEFAULT '1',
+  `client_id` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `guest` tinyint(4) unsigned DEFAULT '1',
   `time` varchar(14) DEFAULT '',
   `data` mediumtext,
   `userid` int(11) DEFAULT '0',
-  `username` varchar(150) DEFAULT ''
+  `username` varchar(150) DEFAULT '',
+  PRIMARY KEY (`session_id`),
+  KEY `userid` (`userid`),
+  KEY `time` (`time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Contenu de la table `x8n17_session`
+--
+
+INSERT INTO `x8n17_session` (`session_id`, `client_id`, `guest`, `time`, `data`, `userid`, `username`) VALUES
+('78patdn9b5npujuingqf9kpga0', 0, 0, '1454334505', 'joomla|s:2228:"TzoyNDoiSm9vbWxhXFJlZ2lzdHJ5XFJlZ2lzdHJ5IjoyOntzOjc6IgAqAGRhdGEiO086ODoic3RkQ2xhc3MiOjE6e3M6OToiX19kZWZhdWx0IjtPOjg6InN0ZENsYXNzIjo0OntzOjc6InNlc3Npb24iO086ODoic3RkQ2xhc3MiOjM6e3M6NzoiY291bnRlciI7aTo2NztzOjU6InRpbWVyIjtPOjg6InN0ZENsYXNzIjozOntzOjU6InN0YXJ0IjtpOjE0NTQzMzI4ODE7czo0OiJsYXN0IjtpOjE0NTQzMzQ0NzU7czozOiJub3ciO2k6MTQ1NDMzNDUwNTt9czo1OiJ0b2tlbiI7czozMjoiM2IzOTc0YWI4YTg3ZmM2ZWU0YTZhYWRmOGE3MGNhZTEiO31zOjg6InJlZ2lzdHJ5IjtPOjI0OiJKb29tbGFcUmVnaXN0cnlcUmVnaXN0cnkiOjI6e3M6NzoiACoAZGF0YSI7Tzo4OiJzdGRDbGFzcyI6MTp7czo1OiJ1c2VycyI7Tzo4OiJzdGRDbGFzcyI6MTp7czo1OiJsb2dpbiI7Tzo4OiJzdGRDbGFzcyI6MTp7czo0OiJmb3JtIjtPOjg6InN0ZENsYXNzIjoyOntzOjY6InJldHVybiI7czozOToiaW5kZXgucGhwP29wdGlvbj1jb21fdXNlcnMmdmlldz1wcm9maWxlIjtzOjQ6ImRhdGEiO2E6MDp7fX19fX1zOjk6InNlcGFyYXRvciI7czoxOiIuIjt9czo0OiJ1c2VyIjtPOjU6IkpVc2VyIjoyODp7czo5OiIAKgBpc1Jvb3QiO2I6MTtzOjI6ImlkIjtzOjM6IjE5MiI7czo0OiJuYW1lIjtzOjE3OiJTdXBlciBVdGlsaXNhdGV1ciI7czo4OiJ1c2VybmFtZSI7czo1OiJhZG1pbiI7czo1OiJlbWFpbCI7czoxOToidGVzdC5hZG1pbkBzaXRlLmNvbSI7czo4OiJwYXNzd29yZCI7czo2MDoiJDJ5JDEwJGNDdlp2MnFqQ3VJa05ENVVLWjlkZ2UycmVTMWxMUGFNZUFzZURCY1MueGpiWnhseXpoUDF1IjtzOjE0OiJwYXNzd29yZF9jbGVhciI7czowOiIiO3M6NToiYmxvY2siO3M6MToiMCI7czo5OiJzZW5kRW1haWwiO3M6MToiMSI7czoxMjoicmVnaXN0ZXJEYXRlIjtzOjE5OiIyMDE2LTAxLTI4IDE2OjU3OjI3IjtzOjEzOiJsYXN0dmlzaXREYXRlIjtzOjE5OiIyMDE2LTAyLTAxIDEzOjIxOjU2IjtzOjEwOiJhY3RpdmF0aW9uIjtzOjE6IjAiO3M6NjoicGFyYW1zIjtzOjA6IiI7czo2OiJncm91cHMiO2E6MTp7aTo4O3M6MToiOCI7fXM6NToiZ3Vlc3QiO2k6MDtzOjEzOiJsYXN0UmVzZXRUaW1lIjtzOjE5OiIwMDAwLTAwLTAwIDAwOjAwOjAwIjtzOjEwOiJyZXNldENvdW50IjtzOjE6IjAiO3M6MTI6InJlcXVpcmVSZXNldCI7czoxOiIwIjtzOjEwOiIAKgBfcGFyYW1zIjtPOjI0OiJKb29tbGFcUmVnaXN0cnlcUmVnaXN0cnkiOjI6e3M6NzoiACoAZGF0YSI7Tzo4OiJzdGRDbGFzcyI6MDp7fXM6OToic2VwYXJhdG9yIjtzOjE6Ii4iO31zOjE0OiIAKgBfYXV0aEdyb3VwcyI7YToyOntpOjA7aToxO2k6MTtpOjg7fXM6MTQ6IgAqAF9hdXRoTGV2ZWxzIjthOjU6e2k6MDtpOjE7aToxO2k6MTtpOjI7aToyO2k6MztpOjM7aTo0O2k6Njt9czoxNToiACoAX2F1dGhBY3Rpb25zIjtOO3M6MTI6IgAqAF9lcnJvck1zZyI7TjtzOjEzOiIAKgB1c2VySGVscGVyIjtPOjE4OiJKVXNlcldyYXBwZXJIZWxwZXIiOjA6e31zOjEwOiIAKgBfZXJyb3JzIjthOjA6e31zOjM6ImFpZCI7aTowO3M6Njoib3RwS2V5IjtzOjA6IiI7czo0OiJvdGVwIjtzOjA6IiI7fXM6MTg6ImtvbWVudG9fbGFzdF9yZXBseSI7czoxMzoiaToxNDU0MzM0MzU2OyI7fX1zOjk6InNlcGFyYXRvciI7czoxOiIuIjt9";', 192, 'admin'),
+('se4cfcfcseri6l81kt20jbc364', 1, 0, '1454334472', 'joomla|s:5300:"TzoyNDoiSm9vbWxhXFJlZ2lzdHJ5XFJlZ2lzdHJ5IjoyOntzOjc6IgAqAGRhdGEiO086ODoic3RkQ2xhc3MiOjI6e3M6OToiX19kZWZhdWx0IjtPOjg6InN0ZENsYXNzIjo0OntzOjc6InNlc3Npb24iO086ODoic3RkQ2xhc3MiOjM6e3M6NzoiY291bnRlciI7aToxODA7czo1OiJ0aW1lciI7Tzo4OiJzdGRDbGFzcyI6Mzp7czo1OiJzdGFydCI7aToxNDU0MzMyOTA2O3M6NDoibGFzdCI7aToxNDU0MzM0NDcyO3M6Mzoibm93IjtpOjE0NTQzMzQ0NzI7fXM6NToidG9rZW4iO3M6MzI6ImYyNzBkMDQwNTY3YzMyM2FkNzI4YmJjZTZjYzFmOGYxIjt9czo4OiJyZWdpc3RyeSI7TzoyNDoiSm9vbWxhXFJlZ2lzdHJ5XFJlZ2lzdHJ5IjoyOntzOjc6IgAqAGRhdGEiO086ODoic3RkQ2xhc3MiOjc6e3M6MTE6ImFwcGxpY2F0aW9uIjtPOjg6InN0ZENsYXNzIjoxOntzOjQ6ImxhbmciO3M6MDoiIjt9czoxMzoiY29tX2luc3RhbGxlciI7Tzo4OiJzdGRDbGFzcyI6Njp7czo3OiJtZXNzYWdlIjtzOjA6IiI7czoxNzoiZXh0ZW5zaW9uX21lc3NhZ2UiO3M6MDoiIjtzOjc6Imluc3RhbGwiO086ODoic3RkQ2xhc3MiOjE6e3M6MTc6Imluc3RhbGxfZGlyZWN0b3J5IjtzOjMwOiJDOlxIVERPQ1NcaGhcc2l0MlxmcmVlLXN0Mlx0bXAiO31zOjEyOiJyZWRpcmVjdF91cmwiO047czo4OiJkaXNjb3ZlciI7Tzo4OiJzdGRDbGFzcyI6Mzp7czo2OiJmaWx0ZXIiO086ODoic3RkQ2xhc3MiOjQ6e3M6Njoic2VhcmNoIjtzOjA6IiI7czo5OiJjbGllbnRfaWQiO3M6MDoiIjtzOjQ6InR5cGUiO3M6MDoiIjtzOjU6Imdyb3VwIjtzOjA6IiI7fXM6ODoib3JkZXJjb2wiO3M6NDoibmFtZSI7czo5OiJvcmRlcmRpcm4iO3M6MzoiYXNjIjt9czo2OiJ1cGRhdGUiO086ODoic3RkQ2xhc3MiOjI6e3M6NjoiZmlsdGVyIjthOjI6e3M6NDoidHlwZSI7czoxNToiY29tcG9uZW50LmFkbWluIjtzOjc6Iml0ZW1faWQiO3M6MToiMSI7fXM6MTA6ImxpbWl0c3RhcnQiO2k6MDt9fXM6NjoiZ2xvYmFsIjtPOjg6InN0ZENsYXNzIjoxOntzOjQ6Imxpc3QiO086ODoic3RkQ2xhc3MiOjE6e3M6NToibGltaXQiO2k6MjA7fX1zOjExOiJjb21fbW9kdWxlcyI7Tzo4OiJzdGRDbGFzcyI6MTp7czo3OiJtb2R1bGVzIjtPOjg6InN0ZENsYXNzIjoxOntzOjY6ImZpbHRlciI7Tzo4OiJzdGRDbGFzcyI6MTp7czoxODoiY2xpZW50X2lkX3ByZXZpb3VzIjtpOjA7fX19czoxNDoiY29tX2pkZXZlbG9wZXIiO086ODoic3RkQ2xhc3MiOjg6e3M6NzoiYXJjaGl2ZSI7Tzo4OiJzdGRDbGFzcyI6MTp7czo4OiJvcmRlcmNvbCI7czo0OiJuYW1lIjt9czo0OiJlZGl0IjtPOjg6InN0ZENsYXNzIjozOntzOjk6ImNvbXBvbmVudCI7Tzo4OiJzdGRDbGFzcyI6Mjp7czo0OiJkYXRhIjtOO3M6MjoiaWQiO2E6MDp7fX1zOjU6InRhYmxlIjtPOjg6InN0ZENsYXNzIjoyOntzOjQ6ImRhdGEiO047czoyOiJpZCI7YTowOnt9fXM6ODoib3ZlcnJpZGUiO086ODoic3RkQ2xhc3MiOjE6e3M6NDoiZGF0YSI7Tjt9fXM6MTU6Im92ZXJyaWRlc2ZpbHRlciI7Tzo4OiJzdGRDbGFzcyI6Mjp7czo0OiJ0eXBlIjtzOjE1OiJjb21wb25lbnQuYWRtaW4iO3M6NzoiaXRlbV9pZCI7czoxOiIxIjt9czo5OiJvdmVycmlkZXMiO086ODoic3RkQ2xhc3MiOjM6e3M6NjoiZmlsdGVyIjthOjI6e3M6NDoidHlwZSI7czoxNToiY29tcG9uZW50LmFkbWluIjtzOjc6Iml0ZW1faWQiO3M6MToiMSI7fXM6MTA6ImxpbWl0c3RhcnQiO2k6MDtzOjQ6Imxpc3QiO2E6NDp7czo5OiJkaXJlY3Rpb24iO3M6MzoiQVNDIjtzOjU6ImxpbWl0IjtpOjIwO3M6ODoib3JkZXJpbmciO3M6NDoibmFtZSI7czo1OiJzdGFydCI7ZDowO319czoxMDoiY29tcG9uZW50cyI7Tzo4OiJzdGRDbGFzcyI6Mjp7czo2OiJmaWx0ZXIiO2E6Mjp7czo0OiJ0eXBlIjtzOjE1OiJjb21wb25lbnQuYWRtaW4iO3M6NzoiaXRlbV9pZCI7czoxOiIxIjt9czoxMDoibGltaXRzdGFydCI7aTowO31zOjc6Im1vZHVsZXMiO086ODoic3RkQ2xhc3MiOjI6e3M6NjoiZmlsdGVyIjthOjI6e3M6NDoidHlwZSI7czoxNToiY29tcG9uZW50LmFkbWluIjtzOjc6Iml0ZW1faWQiO3M6MToiMSI7fXM6MTA6ImxpbWl0c3RhcnQiO2k6MDt9czo3OiJwbHVnaW5zIjtPOjg6InN0ZENsYXNzIjoyOntzOjY6ImZpbHRlciI7YToyOntzOjQ6InR5cGUiO3M6MTU6ImNvbXBvbmVudC5hZG1pbiI7czo3OiJpdGVtX2lkIjtzOjE6IjEiO31zOjEwOiJsaW1pdHN0YXJ0IjtpOjA7fXM6OToidGVtcGxhdGVzIjtPOjg6InN0ZENsYXNzIjoyOntzOjY6ImZpbHRlciI7YToyOntzOjQ6InR5cGUiO3M6MTU6ImNvbXBvbmVudC5hZG1pbiI7czo3OiJpdGVtX2lkIjtzOjE6IjEiO31zOjEwOiJsaW1pdHN0YXJ0IjtpOjA7fX1zOjE0OiJjb21fY2F0ZWdvcmllcyI7Tzo4OiJzdGRDbGFzcyI6Mjp7czoxMDoiY2F0ZWdvcmllcyI7Tzo4OiJzdGRDbGFzcyI6MTp7czo2OiJmaWx0ZXIiO086ODoic3RkQ2xhc3MiOjE6e3M6OToiZXh0ZW5zaW9uIjtzOjExOiJjb21fcnNzZmVlZCI7fX1zOjQ6ImVkaXQiO086ODoic3RkQ2xhc3MiOjE6e3M6ODoiY2F0ZWdvcnkiO086ODoic3RkQ2xhc3MiOjE6e3M6NDoiZGF0YSI7Tjt9fX1zOjExOiJjb21fcnNzZmVlZCI7Tzo4OiJzdGRDbGFzcyI6MTp7czo0OiJlZGl0IjtPOjg6InN0ZENsYXNzIjoyOntzOjEyOiJyc3NfY2F0ZWdvcnkiO086ODoic3RkQ2xhc3MiOjE6e3M6NDoiZGF0YSI7Tjt9czo1OiJmZWVkcyI7Tzo4OiJzdGRDbGFzcyI6MTp7czo0OiJkYXRhIjtOO319fX1zOjk6InNlcGFyYXRvciI7czoxOiIuIjt9czo0OiJ1c2VyIjtPOjU6IkpVc2VyIjoyODp7czo5OiIAKgBpc1Jvb3QiO2I6MTtzOjI6ImlkIjtzOjM6IjE5MiI7czo0OiJuYW1lIjtzOjE3OiJTdXBlciBVdGlsaXNhdGV1ciI7czo4OiJ1c2VybmFtZSI7czo1OiJhZG1pbiI7czo1OiJlbWFpbCI7czoxOToidGVzdC5hZG1pbkBzaXRlLmNvbSI7czo4OiJwYXNzd29yZCI7czo2MDoiJDJ5JDEwJGNDdlp2MnFqQ3VJa05ENVVLWjlkZ2UycmVTMWxMUGFNZUFzZURCY1MueGpiWnhseXpoUDF1IjtzOjE0OiJwYXNzd29yZF9jbGVhciI7czowOiIiO3M6NToiYmxvY2siO3M6MToiMCI7czo5OiJzZW5kRW1haWwiO3M6MToiMSI7czoxMjoicmVnaXN0ZXJEYXRlIjtzOjE5OiIyMDE2LTAxLTI4IDE2OjU3OjI3IjtzOjEzOiJsYXN0dmlzaXREYXRlIjtzOjE5OiIyMDE2LTAxLTMwIDIwOjQ4OjI4IjtzOjEwOiJhY3RpdmF0aW9uIjtzOjE6IjAiO3M6NjoicGFyYW1zIjtzOjA6IiI7czo2OiJncm91cHMiO2E6MTp7aTo4O3M6MToiOCI7fXM6NToiZ3Vlc3QiO2k6MDtzOjEzOiJsYXN0UmVzZXRUaW1lIjtzOjE5OiIwMDAwLTAwLTAwIDAwOjAwOjAwIjtzOjEwOiJyZXNldENvdW50IjtzOjE6IjAiO3M6MTI6InJlcXVpcmVSZXNldCI7czoxOiIwIjtzOjEwOiIAKgBfcGFyYW1zIjtPOjI0OiJKb29tbGFcUmVnaXN0cnlcUmVnaXN0cnkiOjI6e3M6NzoiACoAZGF0YSI7Tzo4OiJzdGRDbGFzcyI6MDp7fXM6OToic2VwYXJhdG9yIjtzOjE6Ii4iO31zOjE0OiIAKgBfYXV0aEdyb3VwcyI7YToyOntpOjA7aToxO2k6MTtpOjg7fXM6MTQ6IgAqAF9hdXRoTGV2ZWxzIjthOjU6e2k6MDtpOjE7aToxO2k6MTtpOjI7aToyO2k6MztpOjM7aTo0O2k6Njt9czoxNToiACoAX2F1dGhBY3Rpb25zIjtOO3M6MTI6IgAqAF9lcnJvck1zZyI7TjtzOjEzOiIAKgB1c2VySGVscGVyIjtPOjE4OiJKVXNlcldyYXBwZXJIZWxwZXIiOjA6e31zOjEwOiIAKgBfZXJyb3JzIjthOjA6e31zOjM6ImFpZCI7aTowO3M6Njoib3RwS2V5IjtzOjA6IiI7czo0OiJvdGVwIjtzOjA6IiI7fXM6MTE6ImFwcGxpY2F0aW9uIjtPOjg6InN0ZENsYXNzIjoxOntzOjU6InF1ZXVlIjtOO319czoxMToiX19jb21wb25lbnQiO086ODoic3RkQ2xhc3MiOjE6e3M6NDoiZGF0YSI7Tzo4OiJzdGRDbGFzcyI6MTp7czo5OiJjb21wb25lbnQiO086ODoic3RkQ2xhc3MiOjE6e3M6MjoiaWQiO2k6MTt9fX19czo5OiJzZXBhcmF0b3IiO3M6MToiLiI7fQ==";', 192, 'admin');
 
 -- --------------------------------------------------------
 
@@ -1861,38 +2363,46 @@ CREATE TABLE `x8n17_session` (
 -- Structure de la table `x8n17_tags`
 --
 
-CREATE TABLE `x8n17_tags` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `parent_id` int(10) UNSIGNED NOT NULL DEFAULT '0',
+CREATE TABLE IF NOT EXISTS `x8n17_tags` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `parent_id` int(10) unsigned NOT NULL DEFAULT '0',
   `lft` int(11) NOT NULL DEFAULT '0',
   `rgt` int(11) NOT NULL DEFAULT '0',
-  `level` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `level` int(10) unsigned NOT NULL DEFAULT '0',
   `path` varchar(255) NOT NULL DEFAULT '',
   `title` varchar(255) NOT NULL,
   `alias` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
   `note` varchar(255) NOT NULL DEFAULT '',
   `description` mediumtext NOT NULL,
   `published` tinyint(1) NOT NULL DEFAULT '0',
-  `checked_out` int(11) UNSIGNED NOT NULL DEFAULT '0',
+  `checked_out` int(11) unsigned NOT NULL DEFAULT '0',
   `checked_out_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `access` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `access` int(10) unsigned NOT NULL DEFAULT '0',
   `params` text NOT NULL,
   `metadesc` varchar(1024) NOT NULL COMMENT 'The meta description for the page.',
   `metakey` varchar(1024) NOT NULL COMMENT 'The meta keywords for the page.',
   `metadata` varchar(2048) NOT NULL COMMENT 'JSON encoded metadata properties.',
-  `created_user_id` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `created_user_id` int(10) unsigned NOT NULL DEFAULT '0',
   `created_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `created_by_alias` varchar(255) NOT NULL DEFAULT '',
-  `modified_user_id` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `modified_user_id` int(10) unsigned NOT NULL DEFAULT '0',
   `modified_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `images` text NOT NULL,
   `urls` text NOT NULL,
-  `hits` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `hits` int(10) unsigned NOT NULL DEFAULT '0',
   `language` char(7) NOT NULL,
-  `version` int(10) UNSIGNED NOT NULL DEFAULT '1',
+  `version` int(10) unsigned NOT NULL DEFAULT '1',
   `publish_up` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `publish_down` datetime NOT NULL DEFAULT '0000-00-00 00:00:00'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `publish_down` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`),
+  KEY `tag_idx` (`published`,`access`),
+  KEY `idx_access` (`access`),
+  KEY `idx_checkout` (`checked_out`),
+  KEY `idx_path` (`path`),
+  KEY `idx_left_right` (`lft`,`rgt`),
+  KEY `idx_alias` (`alias`),
+  KEY `idx_language` (`language`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 --
 -- Contenu de la table `x8n17_tags`
@@ -1908,14 +2418,17 @@ INSERT INTO `x8n17_tags` (`id`, `parent_id`, `lft`, `rgt`, `level`, `path`, `tit
 -- Structure de la table `x8n17_template_styles`
 --
 
-CREATE TABLE `x8n17_template_styles` (
-  `id` int(10) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_template_styles` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `template` varchar(50) NOT NULL DEFAULT '',
-  `client_id` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+  `client_id` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `home` char(7) NOT NULL DEFAULT '0',
   `title` varchar(255) NOT NULL DEFAULT '',
-  `params` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `params` text NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_template` (`template`),
+  KEY `idx_home` (`home`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=10 ;
 
 --
 -- Contenu de la table `x8n17_template_styles`
@@ -1934,11 +2447,15 @@ INSERT INTO `x8n17_template_styles` (`id`, `template`, `client_id`, `home`, `tit
 -- Structure de la table `x8n17_ucm_base`
 --
 
-CREATE TABLE `x8n17_ucm_base` (
-  `ucm_id` int(10) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_ucm_base` (
+  `ucm_id` int(10) unsigned NOT NULL,
   `ucm_item_id` int(10) NOT NULL,
   `ucm_type_id` int(11) NOT NULL,
-  `ucm_language_id` int(11) NOT NULL
+  `ucm_language_id` int(11) NOT NULL,
+  PRIMARY KEY (`ucm_id`),
+  KEY `idx_ucm_item_id` (`ucm_item_id`),
+  KEY `idx_ucm_type_id` (`ucm_type_id`),
+  KEY `idx_ucm_language_id` (`ucm_language_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1954,40 +2471,53 @@ INSERT INTO `x8n17_ucm_base` (`ucm_id`, `ucm_item_id`, `ucm_type_id`, `ucm_langu
 -- Structure de la table `x8n17_ucm_content`
 --
 
-CREATE TABLE `x8n17_ucm_content` (
-  `core_content_id` int(10) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_ucm_content` (
+  `core_content_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `core_type_alias` varchar(255) NOT NULL DEFAULT '' COMMENT 'FK to the content types table',
   `core_title` varchar(255) NOT NULL,
   `core_alias` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '',
   `core_body` mediumtext NOT NULL,
   `core_state` tinyint(1) NOT NULL DEFAULT '0',
   `core_checked_out_time` varchar(255) NOT NULL DEFAULT '',
-  `core_checked_out_user_id` int(10) UNSIGNED NOT NULL DEFAULT '0',
-  `core_access` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `core_checked_out_user_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `core_access` int(10) unsigned NOT NULL DEFAULT '0',
   `core_params` text NOT NULL,
-  `core_featured` tinyint(4) UNSIGNED NOT NULL DEFAULT '0',
+  `core_featured` tinyint(4) unsigned NOT NULL DEFAULT '0',
   `core_metadata` varchar(2048) NOT NULL COMMENT 'JSON encoded metadata properties.',
-  `core_created_user_id` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `core_created_user_id` int(10) unsigned NOT NULL DEFAULT '0',
   `core_created_by_alias` varchar(255) NOT NULL DEFAULT '',
   `core_created_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `core_modified_user_id` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Most recent user that modified',
+  `core_modified_user_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Most recent user that modified',
   `core_modified_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `core_language` char(7) NOT NULL,
   `core_publish_up` datetime NOT NULL,
   `core_publish_down` datetime NOT NULL,
-  `core_content_item_id` int(10) UNSIGNED DEFAULT NULL COMMENT 'ID from the individual type table',
-  `asset_id` int(10) UNSIGNED DEFAULT NULL COMMENT 'FK to the #__assets table.',
+  `core_content_item_id` int(10) unsigned DEFAULT NULL COMMENT 'ID from the individual type table',
+  `asset_id` int(10) unsigned DEFAULT NULL COMMENT 'FK to the #__assets table.',
   `core_images` text NOT NULL,
   `core_urls` text NOT NULL,
-  `core_hits` int(10) UNSIGNED NOT NULL DEFAULT '0',
-  `core_version` int(10) UNSIGNED NOT NULL DEFAULT '1',
+  `core_hits` int(10) unsigned NOT NULL DEFAULT '0',
+  `core_version` int(10) unsigned NOT NULL DEFAULT '1',
   `core_ordering` int(11) NOT NULL DEFAULT '0',
   `core_metakey` text NOT NULL,
   `core_metadesc` text NOT NULL,
-  `core_catid` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `core_catid` int(10) unsigned NOT NULL DEFAULT '0',
   `core_xreference` varchar(50) NOT NULL COMMENT 'A reference to enable linkages to external data sets.',
-  `core_type_id` int(10) UNSIGNED DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Contains core content data in name spaced fields';
+  `core_type_id` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`core_content_id`),
+  KEY `tag_idx` (`core_state`,`core_access`),
+  KEY `idx_access` (`core_access`),
+  KEY `idx_alias` (`core_alias`),
+  KEY `idx_language` (`core_language`),
+  KEY `idx_title` (`core_title`),
+  KEY `idx_modified_time` (`core_modified_time`),
+  KEY `idx_created_time` (`core_created_time`),
+  KEY `idx_content_type` (`core_type_alias`),
+  KEY `idx_core_modified_user_id` (`core_modified_user_id`),
+  KEY `idx_core_checked_out_user_id` (`core_checked_out_user_id`),
+  KEY `idx_core_created_user_id` (`core_created_user_id`),
+  KEY `idx_core_type_id` (`core_type_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Contains core content data in name spaced fields' AUTO_INCREMENT=2 ;
 
 --
 -- Contenu de la table `x8n17_ucm_content`
@@ -2002,18 +2532,21 @@ INSERT INTO `x8n17_ucm_content` (`core_content_id`, `core_type_alias`, `core_tit
 -- Structure de la table `x8n17_ucm_history`
 --
 
-CREATE TABLE `x8n17_ucm_history` (
-  `version_id` int(10) UNSIGNED NOT NULL,
-  `ucm_item_id` int(10) UNSIGNED NOT NULL,
-  `ucm_type_id` int(10) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_ucm_history` (
+  `version_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `ucm_item_id` int(10) unsigned NOT NULL,
+  `ucm_type_id` int(10) unsigned NOT NULL,
   `version_note` varchar(255) NOT NULL DEFAULT '' COMMENT 'Optional version name',
   `save_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `editor_user_id` int(10) UNSIGNED NOT NULL DEFAULT '0',
-  `character_count` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Number of characters in this version.',
+  `editor_user_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `character_count` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Number of characters in this version.',
   `sha1_hash` varchar(50) NOT NULL DEFAULT '' COMMENT 'SHA1 hash of the version_data column.',
   `version_data` mediumtext NOT NULL COMMENT 'json-encoded string of version data',
-  `keep_forever` tinyint(4) NOT NULL DEFAULT '0' COMMENT '0=auto delete; 1=keep'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `keep_forever` tinyint(4) NOT NULL DEFAULT '0' COMMENT '0=auto delete; 1=keep',
+  PRIMARY KEY (`version_id`),
+  KEY `idx_ucm_item_id` (`ucm_type_id`,`ucm_item_id`),
+  KEY `idx_save_date` (`save_date`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=8 ;
 
 --
 -- Contenu de la table `x8n17_ucm_history`
@@ -2034,8 +2567,8 @@ INSERT INTO `x8n17_ucm_history` (`version_id`, `ucm_item_id`, `ucm_type_id`, `ve
 -- Structure de la table `x8n17_updates`
 --
 
-CREATE TABLE `x8n17_updates` (
-  `update_id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_updates` (
+  `update_id` int(11) NOT NULL AUTO_INCREMENT,
   `update_site_id` int(11) DEFAULT '0',
   `extension_id` int(11) DEFAULT '0',
   `name` varchar(100) DEFAULT '',
@@ -2048,78 +2581,67 @@ CREATE TABLE `x8n17_updates` (
   `data` text NOT NULL,
   `detailsurl` text NOT NULL,
   `infourl` text NOT NULL,
-  `extra_query` varchar(1000) DEFAULT ''
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Available Updates';
+  `extra_query` varchar(1000) DEFAULT '',
+  PRIMARY KEY (`update_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Available Updates' AUTO_INCREMENT=53 ;
 
 --
 -- Contenu de la table `x8n17_updates`
 --
 
 INSERT INTO `x8n17_updates` (`update_id`, `update_site_id`, `extension_id`, `name`, `description`, `element`, `type`, `folder`, `client_id`, `version`, `data`, `detailsurl`, `infourl`, `extra_query`) VALUES
-(1, 3, 0, 'Armenian', '', 'pkg_hy-AM', 'package', '', 0, '3.4.4.1', '', 'http://update.joomla.org/language/details3/hy-AM_details.xml', '', ''),
-(2, 3, 0, 'Malay', '', 'pkg_ms-MY', 'package', '', 0, '3.4.1.2', '', 'http://update.joomla.org/language/details3/ms-MY_details.xml', '', ''),
-(3, 3, 0, 'Romanian', '', 'pkg_ro-RO', 'package', '', 0, '3.4.3.1', '', 'http://update.joomla.org/language/details3/ro-RO_details.xml', '', ''),
-(4, 3, 0, 'Flemish', '', 'pkg_nl-BE', 'package', '', 0, '3.4.8.2', '', 'http://update.joomla.org/language/details3/nl-BE_details.xml', '', ''),
-(5, 3, 0, 'Chinese Traditional', '', 'pkg_zh-TW', 'package', '', 0, '3.4.4.1', '', 'http://update.joomla.org/language/details3/zh-TW_details.xml', '', ''),
-(6, 3, 605, 'French', '', 'pkg_fr-FR', 'package', '', 0, '3.4.8.1', '', 'http://update.joomla.org/language/details3/fr-FR_details.xml', '', ''),
-(7, 3, 0, 'Galician', '', 'pkg_gl-ES', 'package', '', 0, '3.3.1.2', '', 'http://update.joomla.org/language/details3/gl-ES_details.xml', '', ''),
-(8, 3, 0, 'German', '', 'pkg_de-DE', 'package', '', 0, '3.4.8.1', '', 'http://update.joomla.org/language/details3/de-DE_details.xml', '', ''),
-(9, 3, 0, 'Greek', '', 'pkg_el-GR', 'package', '', 0, '3.4.2.1', '', 'http://update.joomla.org/language/details3/el-GR_details.xml', '', ''),
-(10, 3, 0, 'Japanese', '', 'pkg_ja-JP', 'package', '', 0, '3.4.8.1', '', 'http://update.joomla.org/language/details3/ja-JP_details.xml', '', ''),
-(11, 3, 0, 'Hebrew', '', 'pkg_he-IL', 'package', '', 0, '3.1.1.1', '', 'http://update.joomla.org/language/details3/he-IL_details.xml', '', ''),
-(12, 3, 0, 'Hungarian', '', 'pkg_hu-HU', 'package', '', 0, '3.4.8.1', '', 'http://update.joomla.org/language/details3/hu-HU_details.xml', '', ''),
-(13, 3, 0, 'Afrikaans', '', 'pkg_af-ZA', 'package', '', 0, '3.4.5.1', '', 'http://update.joomla.org/language/details3/af-ZA_details.xml', '', ''),
-(14, 3, 0, 'Arabic Unitag', '', 'pkg_ar-AA', 'package', '', 0, '3.4.4.1', '', 'http://update.joomla.org/language/details3/ar-AA_details.xml', '', ''),
-(15, 3, 0, 'Belarusian', '', 'pkg_be-BY', 'package', '', 0, '3.2.1.1', '', 'http://update.joomla.org/language/details3/be-BY_details.xml', '', ''),
-(16, 3, 0, 'Bulgarian', '', 'pkg_bg-BG', 'package', '', 0, '3.4.4.2', '', 'http://update.joomla.org/language/details3/bg-BG_details.xml', '', ''),
-(17, 3, 0, 'Catalan', '', 'pkg_ca-ES', 'package', '', 0, '3.4.4.2', '', 'http://update.joomla.org/language/details3/ca-ES_details.xml', '', ''),
-(18, 3, 0, 'Chinese Simplified', '', 'pkg_zh-CN', 'package', '', 0, '3.4.1.1', '', 'http://update.joomla.org/language/details3/zh-CN_details.xml', '', ''),
-(19, 3, 0, 'Croatian', '', 'pkg_hr-HR', 'package', '', 0, '3.4.4.2', '', 'http://update.joomla.org/language/details3/hr-HR_details.xml', '', ''),
-(20, 3, 0, 'Czech', '', 'pkg_cs-CZ', 'package', '', 0, '3.4.1.1', '', 'http://update.joomla.org/language/details3/cs-CZ_details.xml', '', ''),
-(21, 3, 0, 'Danish', '', 'pkg_da-DK', 'package', '', 0, '3.4.4.1', '', 'http://update.joomla.org/language/details3/da-DK_details.xml', '', ''),
-(22, 3, 0, 'Dutch', '', 'pkg_nl-NL', 'package', '', 0, '3.4.4.1', '', 'http://update.joomla.org/language/details3/nl-NL_details.xml', '', ''),
-(23, 3, 0, 'Estonian', '', 'pkg_et-EE', 'package', '', 0, '3.4.4.1', '', 'http://update.joomla.org/language/details3/et-EE_details.xml', '', ''),
-(24, 3, 0, 'English', '', 'pkg_en-AU', 'package', '', 0, '3.4.8.1', '', 'http://update.joomla.org/language/details3/en-AU_details.xml', '', ''),
-(25, 3, 0, 'Italian', '', 'pkg_it-IT', 'package', '', 0, '3.4.8.1', '', 'http://update.joomla.org/language/details3/it-IT_details.xml', '', ''),
-(26, 3, 0, 'Khmer', '', 'pkg_km-KH', 'package', '', 0, '3.4.5.1', '', 'http://update.joomla.org/language/details3/km-KH_details.xml', '', ''),
-(27, 3, 0, 'Korean', '', 'pkg_ko-KR', 'package', '', 0, '3.4.4.2', '', 'http://update.joomla.org/language/details3/ko-KR_details.xml', '', ''),
-(28, 3, 0, 'Latvian', '', 'pkg_lv-LV', 'package', '', 0, '3.4.3.1', '', 'http://update.joomla.org/language/details3/lv-LV_details.xml', '', ''),
-(29, 3, 0, 'Macedonian', '', 'pkg_mk-MK', 'package', '', 0, '3.4.5.1', '', 'http://update.joomla.org/language/details3/mk-MK_details.xml', '', ''),
-(30, 3, 0, 'Norwegian Bokmal', '', 'pkg_nb-NO', 'package', '', 0, '3.4.5.1', '', 'http://update.joomla.org/language/details3/nb-NO_details.xml', '', ''),
-(31, 3, 0, 'Norwegian Nynorsk', '', 'pkg_nn-NO', 'package', '', 0, '3.4.2.1', '', 'http://update.joomla.org/language/details3/nn-NO_details.xml', '', ''),
-(32, 3, 0, 'Persian', '', 'pkg_fa-IR', 'package', '', 0, '3.4.8.1', '', 'http://update.joomla.org/language/details3/fa-IR_details.xml', '', ''),
-(33, 3, 0, 'Polish', '', 'pkg_pl-PL', 'package', '', 0, '3.4.8.1', '', 'http://update.joomla.org/language/details3/pl-PL_details.xml', '', ''),
-(34, 3, 0, 'English', '', 'pkg_en-US', 'package', '', 0, '3.4.6.1', '', 'http://update.joomla.org/language/details3/en-US_details.xml', '', ''),
-(35, 3, 0, 'Portuguese', '', 'pkg_pt-PT', 'package', '', 0, '3.4.5.1', '', 'http://update.joomla.org/language/details3/pt-PT_details.xml', '', ''),
-(36, 3, 0, 'Russian', '', 'pkg_ru-RU', 'package', '', 0, '3.4.1.3', '', 'http://update.joomla.org/language/details3/ru-RU_details.xml', '', ''),
-(37, 3, 0, 'Slovak', '', 'pkg_sk-SK', 'package', '', 0, '3.4.8.2', '', 'http://update.joomla.org/language/details3/sk-SK_details.xml', '', ''),
-(38, 3, 0, 'Swedish', '', 'pkg_sv-SE', 'package', '', 0, '3.4.8.1', '', 'http://update.joomla.org/language/details3/sv-SE_details.xml', '', ''),
-(39, 3, 0, 'Syriac', '', 'pkg_sy-IQ', 'package', '', 0, '3.4.5.1', '', 'http://update.joomla.org/language/details3/sy-IQ_details.xml', '', ''),
-(40, 3, 0, 'Tamil', '', 'pkg_ta-IN', 'package', '', 0, '3.4.8.1', '', 'http://update.joomla.org/language/details3/ta-IN_details.xml', '', ''),
-(41, 3, 0, 'Thai', '', 'pkg_th-TH', 'package', '', 0, '3.4.8.1', '', 'http://update.joomla.org/language/details3/th-TH_details.xml', '', ''),
-(42, 3, 0, 'Turkish', '', 'pkg_tr-TR', 'package', '', 0, '3.4.8.1', '', 'http://update.joomla.org/language/details3/tr-TR_details.xml', '', ''),
-(43, 3, 0, 'Ukrainian', '', 'pkg_uk-UA', 'package', '', 0, '3.4.4.1', '', 'http://update.joomla.org/language/details3/uk-UA_details.xml', '', ''),
-(44, 3, 0, 'Uyghur', '', 'pkg_ug-CN', 'package', '', 0, '3.3.0.1', '', 'http://update.joomla.org/language/details3/ug-CN_details.xml', '', ''),
-(45, 3, 0, 'Albanian', '', 'pkg_sq-AL', 'package', '', 0, '3.1.1.1', '', 'http://update.joomla.org/language/details3/sq-AL_details.xml', '', ''),
-(46, 3, 0, 'Hindi', '', 'pkg_hi-IN', 'package', '', 0, '3.3.6.1', '', 'http://update.joomla.org/language/details3/hi-IN_details.xml', '', ''),
-(47, 3, 0, 'Portuguese Brazil', '', 'pkg_pt-BR', 'package', '', 0, '3.4.4.1', '', 'http://update.joomla.org/language/details3/pt-BR_details.xml', '', ''),
-(48, 3, 0, 'Serbian Latin', '', 'pkg_sr-YU', 'package', '', 0, '3.4.4.1', '', 'http://update.joomla.org/language/details3/sr-YU_details.xml', '', ''),
-(49, 3, 0, 'Spanish', '', 'pkg_es-ES', 'package', '', 0, '3.4.4.1', '', 'http://update.joomla.org/language/details3/es-ES_details.xml', '', ''),
-(50, 3, 0, 'Bosnian', '', 'pkg_bs-BA', 'package', '', 0, '3.4.8.1', '', 'http://update.joomla.org/language/details3/bs-BA_details.xml', '', ''),
-(51, 3, 0, 'Serbian Cyrillic', '', 'pkg_sr-RS', 'package', '', 0, '3.4.4.1', '', 'http://update.joomla.org/language/details3/sr-RS_details.xml', '', ''),
-(52, 3, 0, 'Vietnamese', '', 'pkg_vi-VN', 'package', '', 0, '3.2.1.1', '', 'http://update.joomla.org/language/details3/vi-VN_details.xml', '', ''),
-(53, 3, 0, 'Bahasa Indonesia', '', 'pkg_id-ID', 'package', '', 0, '3.3.0.2', '', 'http://update.joomla.org/language/details3/id-ID_details.xml', '', ''),
-(54, 3, 0, 'Finnish', '', 'pkg_fi-FI', 'package', '', 0, '3.4.2.1', '', 'http://update.joomla.org/language/details3/fi-FI_details.xml', '', ''),
-(55, 3, 0, 'Swahili', '', 'pkg_sw-KE', 'package', '', 0, '3.4.8.1', '', 'http://update.joomla.org/language/details3/sw-KE_details.xml', '', ''),
-(56, 3, 0, 'Montenegrin', '', 'pkg_srp-ME', 'package', '', 0, '3.3.1.1', '', 'http://update.joomla.org/language/details3/srp-ME_details.xml', '', ''),
-(57, 3, 0, 'FrenchCA', '', 'pkg_fr-CA', 'package', '', 0, '3.4.4.3', '', 'http://update.joomla.org/language/details3/fr-CA_details.xml', '', ''),
-(58, 3, 0, 'English', '', 'pkg_en-CA', 'package', '', 0, '3.4.6.1', '', 'http://update.joomla.org/language/details3/en-CA_details.xml', '', ''),
-(59, 3, 0, 'Welsh', '', 'pkg_cy-GB', 'package', '', 0, '3.3.0.2', '', 'http://update.joomla.org/language/details3/cy-GB_details.xml', '', ''),
-(60, 3, 0, 'Sinhala', '', 'pkg_si-LK', 'package', '', 0, '3.3.1.1', '', 'http://update.joomla.org/language/details3/si-LK_details.xml', '', ''),
-(61, 3, 0, 'Dari Persian', '', 'pkg_prs-AF', 'package', '', 0, '3.4.4.1', '', 'http://update.joomla.org/language/details3/prs-AF_details.xml', '', ''),
-(62, 3, 0, 'Turkmen', '', 'pkg_tk-TM', 'package', '', 0, '3.4.8.1', '', 'http://update.joomla.org/language/details3/tk-TM_details.xml', '', ''),
-(63, 3, 0, 'Irish', '', 'pkg_ga-IE', 'package', '', 0, '3.4.5.2', '', 'http://update.joomla.org/language/details3/ga-IE_details.xml', '', ''),
-(64, 3, 0, 'Dzongkha', '', 'pkg_dz-BT', 'package', '', 0, '3.4.5.1', '', 'http://update.joomla.org/language/details3/dz-BT_details.xml', '', '');
+(1, 3, 0, 'Arabic Unitag', '', 'pkg_ar-AA', 'package', '', 0, '3.4.4.1', '', 'http://update.joomla.org/language/details3/ar-AA_details.xml', '', ''),
+(2, 3, 0, 'Belarusian', '', 'pkg_be-BY', 'package', '', 0, '3.2.1.1', '', 'http://update.joomla.org/language/details3/be-BY_details.xml', '', ''),
+(3, 3, 0, 'Bulgarian', '', 'pkg_bg-BG', 'package', '', 0, '3.4.4.2', '', 'http://update.joomla.org/language/details3/bg-BG_details.xml', '', ''),
+(4, 3, 0, 'Catalan', '', 'pkg_ca-ES', 'package', '', 0, '3.4.4.2', '', 'http://update.joomla.org/language/details3/ca-ES_details.xml', '', ''),
+(5, 3, 0, 'Chinese Simplified', '', 'pkg_zh-CN', 'package', '', 0, '3.4.1.1', '', 'http://update.joomla.org/language/details3/zh-CN_details.xml', '', ''),
+(6, 3, 0, 'Croatian', '', 'pkg_hr-HR', 'package', '', 0, '3.4.4.2', '', 'http://update.joomla.org/language/details3/hr-HR_details.xml', '', ''),
+(7, 3, 0, 'Czech', '', 'pkg_cs-CZ', 'package', '', 0, '3.4.1.1', '', 'http://update.joomla.org/language/details3/cs-CZ_details.xml', '', ''),
+(8, 3, 0, 'Danish', '', 'pkg_da-DK', 'package', '', 0, '3.4.4.1', '', 'http://update.joomla.org/language/details3/da-DK_details.xml', '', ''),
+(9, 3, 0, 'Dutch', '', 'pkg_nl-NL', 'package', '', 0, '3.4.4.1', '', 'http://update.joomla.org/language/details3/nl-NL_details.xml', '', ''),
+(10, 3, 0, 'Estonian', '', 'pkg_et-EE', 'package', '', 0, '3.4.4.1', '', 'http://update.joomla.org/language/details3/et-EE_details.xml', '', ''),
+(11, 3, 0, 'English', '', 'pkg_en-AU', 'package', '', 0, '3.4.8.1', '', 'http://update.joomla.org/language/details3/en-AU_details.xml', '', ''),
+(12, 3, 0, 'Italian', '', 'pkg_it-IT', 'package', '', 0, '3.4.8.1', '', 'http://update.joomla.org/language/details3/it-IT_details.xml', '', ''),
+(13, 3, 0, 'Khmer', '', 'pkg_km-KH', 'package', '', 0, '3.4.5.1', '', 'http://update.joomla.org/language/details3/km-KH_details.xml', '', ''),
+(14, 3, 0, 'Korean', '', 'pkg_ko-KR', 'package', '', 0, '3.4.4.2', '', 'http://update.joomla.org/language/details3/ko-KR_details.xml', '', ''),
+(15, 3, 0, 'Latvian', '', 'pkg_lv-LV', 'package', '', 0, '3.4.3.1', '', 'http://update.joomla.org/language/details3/lv-LV_details.xml', '', ''),
+(16, 3, 0, 'Macedonian', '', 'pkg_mk-MK', 'package', '', 0, '3.4.5.1', '', 'http://update.joomla.org/language/details3/mk-MK_details.xml', '', ''),
+(17, 3, 0, 'Norwegian Bokmal', '', 'pkg_nb-NO', 'package', '', 0, '3.4.5.1', '', 'http://update.joomla.org/language/details3/nb-NO_details.xml', '', ''),
+(18, 3, 0, 'Norwegian Nynorsk', '', 'pkg_nn-NO', 'package', '', 0, '3.4.2.1', '', 'http://update.joomla.org/language/details3/nn-NO_details.xml', '', ''),
+(19, 3, 0, 'Persian', '', 'pkg_fa-IR', 'package', '', 0, '3.4.8.1', '', 'http://update.joomla.org/language/details3/fa-IR_details.xml', '', ''),
+(20, 3, 0, 'Polish', '', 'pkg_pl-PL', 'package', '', 0, '3.4.8.1', '', 'http://update.joomla.org/language/details3/pl-PL_details.xml', '', ''),
+(21, 3, 0, 'English', '', 'pkg_en-US', 'package', '', 0, '3.4.6.1', '', 'http://update.joomla.org/language/details3/en-US_details.xml', '', ''),
+(22, 3, 0, 'Portuguese', '', 'pkg_pt-PT', 'package', '', 0, '3.4.5.1', '', 'http://update.joomla.org/language/details3/pt-PT_details.xml', '', ''),
+(23, 3, 0, 'Russian', '', 'pkg_ru-RU', 'package', '', 0, '3.4.1.3', '', 'http://update.joomla.org/language/details3/ru-RU_details.xml', '', ''),
+(24, 3, 0, 'Slovak', '', 'pkg_sk-SK', 'package', '', 0, '3.4.8.2', '', 'http://update.joomla.org/language/details3/sk-SK_details.xml', '', ''),
+(25, 3, 0, 'Swedish', '', 'pkg_sv-SE', 'package', '', 0, '3.4.8.1', '', 'http://update.joomla.org/language/details3/sv-SE_details.xml', '', ''),
+(26, 3, 0, 'Syriac', '', 'pkg_sy-IQ', 'package', '', 0, '3.4.5.1', '', 'http://update.joomla.org/language/details3/sy-IQ_details.xml', '', ''),
+(27, 3, 0, 'Tamil', '', 'pkg_ta-IN', 'package', '', 0, '3.4.8.1', '', 'http://update.joomla.org/language/details3/ta-IN_details.xml', '', ''),
+(28, 3, 0, 'Thai', '', 'pkg_th-TH', 'package', '', 0, '3.4.8.1', '', 'http://update.joomla.org/language/details3/th-TH_details.xml', '', ''),
+(29, 3, 0, 'Turkish', '', 'pkg_tr-TR', 'package', '', 0, '3.4.8.1', '', 'http://update.joomla.org/language/details3/tr-TR_details.xml', '', ''),
+(30, 3, 0, 'Ukrainian', '', 'pkg_uk-UA', 'package', '', 0, '3.4.4.1', '', 'http://update.joomla.org/language/details3/uk-UA_details.xml', '', ''),
+(31, 3, 0, 'Uyghur', '', 'pkg_ug-CN', 'package', '', 0, '3.3.0.1', '', 'http://update.joomla.org/language/details3/ug-CN_details.xml', '', ''),
+(32, 3, 0, 'Albanian', '', 'pkg_sq-AL', 'package', '', 0, '3.1.1.1', '', 'http://update.joomla.org/language/details3/sq-AL_details.xml', '', ''),
+(33, 3, 0, 'Hindi', '', 'pkg_hi-IN', 'package', '', 0, '3.3.6.1', '', 'http://update.joomla.org/language/details3/hi-IN_details.xml', '', ''),
+(34, 3, 0, 'Portuguese Brazil', '', 'pkg_pt-BR', 'package', '', 0, '3.4.4.1', '', 'http://update.joomla.org/language/details3/pt-BR_details.xml', '', ''),
+(35, 3, 0, 'Serbian Latin', '', 'pkg_sr-YU', 'package', '', 0, '3.4.4.1', '', 'http://update.joomla.org/language/details3/sr-YU_details.xml', '', ''),
+(36, 3, 0, 'Spanish', '', 'pkg_es-ES', 'package', '', 0, '3.4.4.1', '', 'http://update.joomla.org/language/details3/es-ES_details.xml', '', ''),
+(37, 3, 0, 'Bosnian', '', 'pkg_bs-BA', 'package', '', 0, '3.4.8.1', '', 'http://update.joomla.org/language/details3/bs-BA_details.xml', '', ''),
+(38, 3, 0, 'Serbian Cyrillic', '', 'pkg_sr-RS', 'package', '', 0, '3.4.4.1', '', 'http://update.joomla.org/language/details3/sr-RS_details.xml', '', ''),
+(39, 3, 0, 'Vietnamese', '', 'pkg_vi-VN', 'package', '', 0, '3.2.1.1', '', 'http://update.joomla.org/language/details3/vi-VN_details.xml', '', ''),
+(40, 3, 0, 'Bahasa Indonesia', '', 'pkg_id-ID', 'package', '', 0, '3.3.0.2', '', 'http://update.joomla.org/language/details3/id-ID_details.xml', '', ''),
+(41, 3, 0, 'Finnish', '', 'pkg_fi-FI', 'package', '', 0, '3.4.2.1', '', 'http://update.joomla.org/language/details3/fi-FI_details.xml', '', ''),
+(42, 3, 0, 'Swahili', '', 'pkg_sw-KE', 'package', '', 0, '3.4.8.1', '', 'http://update.joomla.org/language/details3/sw-KE_details.xml', '', ''),
+(43, 3, 0, 'Montenegrin', '', 'pkg_srp-ME', 'package', '', 0, '3.3.1.1', '', 'http://update.joomla.org/language/details3/srp-ME_details.xml', '', ''),
+(44, 3, 0, 'FrenchCA', '', 'pkg_fr-CA', 'package', '', 0, '3.4.4.3', '', 'http://update.joomla.org/language/details3/fr-CA_details.xml', '', ''),
+(45, 3, 0, 'English', '', 'pkg_en-CA', 'package', '', 0, '3.4.6.1', '', 'http://update.joomla.org/language/details3/en-CA_details.xml', '', ''),
+(46, 3, 0, 'Welsh', '', 'pkg_cy-GB', 'package', '', 0, '3.3.0.2', '', 'http://update.joomla.org/language/details3/cy-GB_details.xml', '', ''),
+(47, 3, 0, 'Sinhala', '', 'pkg_si-LK', 'package', '', 0, '3.3.1.1', '', 'http://update.joomla.org/language/details3/si-LK_details.xml', '', ''),
+(48, 3, 0, 'Dari Persian', '', 'pkg_prs-AF', 'package', '', 0, '3.4.4.1', '', 'http://update.joomla.org/language/details3/prs-AF_details.xml', '', ''),
+(49, 3, 0, 'Turkmen', '', 'pkg_tk-TM', 'package', '', 0, '3.4.8.1', '', 'http://update.joomla.org/language/details3/tk-TM_details.xml', '', ''),
+(50, 3, 0, 'Irish', '', 'pkg_ga-IE', 'package', '', 0, '3.4.5.2', '', 'http://update.joomla.org/language/details3/ga-IE_details.xml', '', ''),
+(51, 3, 0, 'Dzongkha', '', 'pkg_dz-BT', 'package', '', 0, '3.4.5.1', '', 'http://update.joomla.org/language/details3/dz-BT_details.xml', '', ''),
+(52, 5, 0, 'Installer - Install from Web', 'This plugin offers functionality for the ''Install from Web'' tab.', 'webinstaller', 'plugin', 'installer', 0, '1.0.5', '', 'http://appscdn.joomla.org/webapps/jedapps/webinstaller.xml', 'http://docs.joomla.org/Install_from_Web', '');
 
 -- --------------------------------------------------------
 
@@ -2127,26 +2649,29 @@ INSERT INTO `x8n17_updates` (`update_id`, `update_site_id`, `extension_id`, `nam
 -- Structure de la table `x8n17_update_sites`
 --
 
-CREATE TABLE `x8n17_update_sites` (
-  `update_site_id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_update_sites` (
+  `update_site_id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) DEFAULT '',
   `type` varchar(20) DEFAULT '',
   `location` text NOT NULL,
   `enabled` int(11) DEFAULT '0',
   `last_check_timestamp` bigint(20) DEFAULT '0',
-  `extra_query` varchar(1000) DEFAULT ''
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Update Sites';
+  `extra_query` varchar(1000) DEFAULT '',
+  PRIMARY KEY (`update_site_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Update Sites' AUTO_INCREMENT=8 ;
 
 --
 -- Contenu de la table `x8n17_update_sites`
 --
 
 INSERT INTO `x8n17_update_sites` (`update_site_id`, `name`, `type`, `location`, `enabled`, `last_check_timestamp`, `extra_query`) VALUES
-(1, 'Joomla! Core', 'collection', 'http://update.joomla.org/core/list.xml', 1, 1454154571, ''),
+(1, 'Joomla! Core', 'collection', 'http://update.joomla.org/core/list.xml', 1, 1454334380, ''),
 (2, 'Joomla! Extension Directory', 'collection', 'http://update.joomla.org/jed/list.xml', 0, 0, ''),
-(3, 'Accredited Joomla! Translations', 'collection', 'http://update.joomla.org/language/translationlist_3.xml', 1, 1454154571, ''),
-(4, 'Joomla! Update Component Update Site', 'extension', 'http://update.joomla.org/core/extensions/com_joomlaupdate.xml', 1, 1454154571, ''),
-(5, 'WebInstaller Update Site', 'extension', 'http://appscdn.joomla.org/webapps/jedapps/webinstaller.xml', 1, 0, '');
+(3, 'Accredited Joomla! Translations', 'collection', 'http://update.joomla.org/language/translationlist_3.xml', 1, 1454334378, ''),
+(4, 'Joomla! Update Component Update Site', 'extension', 'http://update.joomla.org/core/extensions/com_joomlaupdate.xml', 1, 1454334378, ''),
+(5, 'WebInstaller Update Site', 'extension', 'http://appscdn.joomla.org/webapps/jedapps/webinstaller.xml', 1, 1454334378, ''),
+(6, 'JDeveloper Update Site', 'extension', 'http://joommaster.bplaced.net/updates/jdeveloper-update.xml', 1, 1454334378, ''),
+(7, 'JDeveloper Update Site', 'extension', 'http://joommaster.bplaced.net/updates/lib_jcms_update.xml', 1, 1454334378, '');
 
 -- --------------------------------------------------------
 
@@ -2154,9 +2679,10 @@ INSERT INTO `x8n17_update_sites` (`update_site_id`, `name`, `type`, `location`, 
 -- Structure de la table `x8n17_update_sites_extensions`
 --
 
-CREATE TABLE `x8n17_update_sites_extensions` (
+CREATE TABLE IF NOT EXISTS `x8n17_update_sites_extensions` (
   `update_site_id` int(11) NOT NULL DEFAULT '0',
-  `extension_id` int(11) NOT NULL DEFAULT '0'
+  `extension_id` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`update_site_id`,`extension_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Links extensions to update sites';
 
 --
@@ -2168,7 +2694,9 @@ INSERT INTO `x8n17_update_sites_extensions` (`update_site_id`, `extension_id`) V
 (2, 700),
 (3, 600),
 (4, 28),
-(5, 605);
+(5, 605),
+(6, 10022),
+(7, 10023);
 
 -- --------------------------------------------------------
 
@@ -2176,13 +2704,18 @@ INSERT INTO `x8n17_update_sites_extensions` (`update_site_id`, `extension_id`) V
 -- Structure de la table `x8n17_usergroups`
 --
 
-CREATE TABLE `x8n17_usergroups` (
-  `id` int(10) UNSIGNED NOT NULL COMMENT 'Primary Key',
-  `parent_id` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Adjacency List Reference Id',
+CREATE TABLE IF NOT EXISTS `x8n17_usergroups` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
+  `parent_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Adjacency List Reference Id',
   `lft` int(11) NOT NULL DEFAULT '0' COMMENT 'Nested set lft.',
   `rgt` int(11) NOT NULL DEFAULT '0' COMMENT 'Nested set rgt.',
-  `title` varchar(100) NOT NULL DEFAULT ''
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `title` varchar(100) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_usergroup_parent_title_lookup` (`parent_id`,`title`),
+  KEY `idx_usergroup_title_lookup` (`title`),
+  KEY `idx_usergroup_adjacency_lookup` (`parent_id`),
+  KEY `idx_usergroup_nested_set_lookup` (`lft`,`rgt`) USING BTREE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=10 ;
 
 --
 -- Contenu de la table `x8n17_usergroups`
@@ -2205,8 +2738,8 @@ INSERT INTO `x8n17_usergroups` (`id`, `parent_id`, `lft`, `rgt`, `title`) VALUES
 -- Structure de la table `x8n17_users`
 --
 
-CREATE TABLE `x8n17_users` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL DEFAULT '',
   `username` varchar(150) NOT NULL DEFAULT '',
   `email` varchar(100) NOT NULL DEFAULT '',
@@ -2221,15 +2754,20 @@ CREATE TABLE `x8n17_users` (
   `resetCount` int(11) NOT NULL DEFAULT '0' COMMENT 'Count of password resets since lastResetTime',
   `otpKey` varchar(1000) NOT NULL DEFAULT '' COMMENT 'Two factor authentication encrypted keys',
   `otep` varchar(1000) NOT NULL DEFAULT '' COMMENT 'One time emergency passwords',
-  `requireReset` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'Require user to reset password on next login'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `requireReset` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'Require user to reset password on next login',
+  PRIMARY KEY (`id`),
+  KEY `idx_name` (`name`),
+  KEY `idx_block` (`block`),
+  KEY `username` (`username`),
+  KEY `email` (`email`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=193 ;
 
 --
 -- Contenu de la table `x8n17_users`
 --
 
 INSERT INTO `x8n17_users` (`id`, `name`, `username`, `email`, `password`, `block`, `sendEmail`, `registerDate`, `lastvisitDate`, `activation`, `params`, `lastResetTime`, `resetCount`, `otpKey`, `otep`, `requireReset`) VALUES
-(192, 'Super Utilisateur', 'admin', 'test.admin@site.com', '$2y$10$cCvZv2qjCuIkND5UKZ9dge2reS1lLPaMeAseDBcS.xjbZxlyzhP1u', 0, 1, '2016-01-28 16:57:27', '2016-01-30 20:48:28', '0', '', '0000-00-00 00:00:00', 0, '', '', 0);
+(192, 'Super Utilisateur', 'admin', 'test.admin@site.com', '$2y$10$cCvZv2qjCuIkND5UKZ9dge2reS1lLPaMeAseDBcS.xjbZxlyzhP1u', 0, 1, '2016-01-28 16:57:27', '2016-02-01 13:44:48', '0', '', '0000-00-00 00:00:00', 0, '', '', 0);
 
 -- --------------------------------------------------------
 
@@ -2237,15 +2775,20 @@ INSERT INTO `x8n17_users` (`id`, `name`, `username`, `email`, `password`, `block
 -- Structure de la table `x8n17_user_keys`
 --
 
-CREATE TABLE `x8n17_user_keys` (
-  `id` int(10) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `x8n17_user_keys` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` varchar(255) NOT NULL,
   `token` varchar(255) NOT NULL,
   `series` varchar(255) NOT NULL,
   `invalid` tinyint(4) NOT NULL,
   `time` varchar(200) NOT NULL,
-  `uastring` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `uastring` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `series` (`series`),
+  UNIQUE KEY `series_2` (`series`),
+  UNIQUE KEY `series_3` (`series`),
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -2253,23 +2796,26 @@ CREATE TABLE `x8n17_user_keys` (
 -- Structure de la table `x8n17_user_notes`
 --
 
-CREATE TABLE `x8n17_user_notes` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `user_id` int(10) UNSIGNED NOT NULL DEFAULT '0',
-  `catid` int(10) UNSIGNED NOT NULL DEFAULT '0',
+CREATE TABLE IF NOT EXISTS `x8n17_user_notes` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `catid` int(10) unsigned NOT NULL DEFAULT '0',
   `subject` varchar(100) NOT NULL DEFAULT '',
   `body` text NOT NULL,
   `state` tinyint(3) NOT NULL DEFAULT '0',
-  `checked_out` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `checked_out` int(10) unsigned NOT NULL DEFAULT '0',
   `checked_out_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `created_user_id` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `created_user_id` int(10) unsigned NOT NULL DEFAULT '0',
   `created_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `modified_user_id` int(10) UNSIGNED NOT NULL,
+  `modified_user_id` int(10) unsigned NOT NULL,
   `modified_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `review_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `publish_up` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `publish_down` datetime NOT NULL DEFAULT '0000-00-00 00:00:00'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `publish_down` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_category_id` (`catid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -2277,11 +2823,12 @@ CREATE TABLE `x8n17_user_notes` (
 -- Structure de la table `x8n17_user_profiles`
 --
 
-CREATE TABLE `x8n17_user_profiles` (
+CREATE TABLE IF NOT EXISTS `x8n17_user_profiles` (
   `user_id` int(11) NOT NULL,
   `profile_key` varchar(100) NOT NULL,
   `profile_value` text NOT NULL,
-  `ordering` int(11) NOT NULL DEFAULT '0'
+  `ordering` int(11) NOT NULL DEFAULT '0',
+  UNIQUE KEY `idx_user_id_profile_key` (`user_id`,`profile_key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Simple user profile storage table';
 
 -- --------------------------------------------------------
@@ -2290,9 +2837,10 @@ CREATE TABLE `x8n17_user_profiles` (
 -- Structure de la table `x8n17_user_usergroup_map`
 --
 
-CREATE TABLE `x8n17_user_usergroup_map` (
-  `user_id` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Foreign Key to #__users.id',
-  `group_id` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Foreign Key to #__usergroups.id'
+CREATE TABLE IF NOT EXISTS `x8n17_user_usergroup_map` (
+  `user_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Foreign Key to #__users.id',
+  `group_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Foreign Key to #__usergroups.id',
+  PRIMARY KEY (`user_id`,`group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -2308,12 +2856,14 @@ INSERT INTO `x8n17_user_usergroup_map` (`user_id`, `group_id`) VALUES
 -- Structure de la table `x8n17_viewlevels`
 --
 
-CREATE TABLE `x8n17_viewlevels` (
-  `id` int(10) UNSIGNED NOT NULL COMMENT 'Primary Key',
+CREATE TABLE IF NOT EXISTS `x8n17_viewlevels` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Primary Key',
   `title` varchar(100) NOT NULL DEFAULT '',
   `ordering` int(11) NOT NULL DEFAULT '0',
-  `rules` varchar(5120) NOT NULL COMMENT 'JSON encoded access control.'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `rules` varchar(5120) NOT NULL COMMENT 'JSON encoded access control.',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_assetgroup_title_lookup` (`title`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
 
 --
 -- Contenu de la table `x8n17_viewlevels`
@@ -2326,865 +2876,6 @@ INSERT INTO `x8n17_viewlevels` (`id`, `title`, `ordering`, `rules`) VALUES
 (5, 'Accès invité', 0, '[9]'),
 (6, 'Accès super utilisateur', 0, '[8]');
 
---
--- Index pour les tables exportées
---
-
---
--- Index pour la table `x8n17_assets`
---
-ALTER TABLE `x8n17_assets`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `idx_asset_name` (`name`),
-  ADD KEY `idx_lft_rgt` (`lft`,`rgt`),
-  ADD KEY `idx_parent_id` (`parent_id`);
-
---
--- Index pour la table `x8n17_associations`
---
-ALTER TABLE `x8n17_associations`
-  ADD PRIMARY KEY (`context`,`id`),
-  ADD KEY `idx_key` (`key`);
-
---
--- Index pour la table `x8n17_banners`
---
-ALTER TABLE `x8n17_banners`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_state` (`state`),
-  ADD KEY `idx_own_prefix` (`own_prefix`),
-  ADD KEY `idx_metakey_prefix` (`metakey_prefix`),
-  ADD KEY `idx_banner_catid` (`catid`),
-  ADD KEY `idx_language` (`language`);
-
---
--- Index pour la table `x8n17_banner_clients`
---
-ALTER TABLE `x8n17_banner_clients`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_own_prefix` (`own_prefix`),
-  ADD KEY `idx_metakey_prefix` (`metakey_prefix`);
-
---
--- Index pour la table `x8n17_banner_tracks`
---
-ALTER TABLE `x8n17_banner_tracks`
-  ADD PRIMARY KEY (`track_date`,`track_type`,`banner_id`),
-  ADD KEY `idx_track_date` (`track_date`),
-  ADD KEY `idx_track_type` (`track_type`),
-  ADD KEY `idx_banner_id` (`banner_id`);
-
---
--- Index pour la table `x8n17_categories`
---
-ALTER TABLE `x8n17_categories`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `cat_idx` (`extension`,`published`,`access`),
-  ADD KEY `idx_access` (`access`),
-  ADD KEY `idx_checkout` (`checked_out`),
-  ADD KEY `idx_path` (`path`),
-  ADD KEY `idx_left_right` (`lft`,`rgt`),
-  ADD KEY `idx_alias` (`alias`),
-  ADD KEY `idx_language` (`language`);
-
---
--- Index pour la table `x8n17_contact_details`
---
-ALTER TABLE `x8n17_contact_details`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_access` (`access`),
-  ADD KEY `idx_checkout` (`checked_out`),
-  ADD KEY `idx_state` (`published`),
-  ADD KEY `idx_catid` (`catid`),
-  ADD KEY `idx_createdby` (`created_by`),
-  ADD KEY `idx_featured_catid` (`featured`,`catid`),
-  ADD KEY `idx_language` (`language`),
-  ADD KEY `idx_xreference` (`xreference`);
-
---
--- Index pour la table `x8n17_content`
---
-ALTER TABLE `x8n17_content`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_access` (`access`),
-  ADD KEY `idx_checkout` (`checked_out`),
-  ADD KEY `idx_state` (`state`),
-  ADD KEY `idx_catid` (`catid`),
-  ADD KEY `idx_createdby` (`created_by`),
-  ADD KEY `idx_featured_catid` (`featured`,`catid`),
-  ADD KEY `idx_language` (`language`),
-  ADD KEY `idx_xreference` (`xreference`);
-
---
--- Index pour la table `x8n17_contentitem_tag_map`
---
-ALTER TABLE `x8n17_contentitem_tag_map`
-  ADD UNIQUE KEY `uc_ItemnameTagid` (`type_id`,`content_item_id`,`tag_id`),
-  ADD KEY `idx_tag_type` (`tag_id`,`type_id`),
-  ADD KEY `idx_date_id` (`tag_date`,`tag_id`),
-  ADD KEY `idx_tag` (`tag_id`),
-  ADD KEY `idx_type` (`type_id`),
-  ADD KEY `idx_core_content_id` (`core_content_id`);
-
---
--- Index pour la table `x8n17_content_frontpage`
---
-ALTER TABLE `x8n17_content_frontpage`
-  ADD PRIMARY KEY (`content_id`);
-
---
--- Index pour la table `x8n17_content_rating`
---
-ALTER TABLE `x8n17_content_rating`
-  ADD PRIMARY KEY (`content_id`);
-
---
--- Index pour la table `x8n17_content_types`
---
-ALTER TABLE `x8n17_content_types`
-  ADD PRIMARY KEY (`type_id`),
-  ADD KEY `idx_alias` (`type_alias`);
-
---
--- Index pour la table `x8n17_extensions`
---
-ALTER TABLE `x8n17_extensions`
-  ADD PRIMARY KEY (`extension_id`),
-  ADD KEY `element_clientid` (`element`,`client_id`),
-  ADD KEY `element_folder_clientid` (`element`,`folder`,`client_id`),
-  ADD KEY `extension` (`type`,`element`,`folder`,`client_id`);
-
---
--- Index pour la table `x8n17_finder_filters`
---
-ALTER TABLE `x8n17_finder_filters`
-  ADD PRIMARY KEY (`filter_id`);
-
---
--- Index pour la table `x8n17_finder_links`
---
-ALTER TABLE `x8n17_finder_links`
-  ADD PRIMARY KEY (`link_id`),
-  ADD KEY `idx_type` (`type_id`),
-  ADD KEY `idx_title` (`title`),
-  ADD KEY `idx_md5` (`md5sum`),
-  ADD KEY `idx_url` (`url`(75)),
-  ADD KEY `idx_published_list` (`published`,`state`,`access`,`publish_start_date`,`publish_end_date`,`list_price`),
-  ADD KEY `idx_published_sale` (`published`,`state`,`access`,`publish_start_date`,`publish_end_date`,`sale_price`);
-
---
--- Index pour la table `x8n17_finder_links_terms0`
---
-ALTER TABLE `x8n17_finder_links_terms0`
-  ADD PRIMARY KEY (`link_id`,`term_id`),
-  ADD KEY `idx_term_weight` (`term_id`,`weight`),
-  ADD KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`);
-
---
--- Index pour la table `x8n17_finder_links_terms1`
---
-ALTER TABLE `x8n17_finder_links_terms1`
-  ADD PRIMARY KEY (`link_id`,`term_id`),
-  ADD KEY `idx_term_weight` (`term_id`,`weight`),
-  ADD KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`);
-
---
--- Index pour la table `x8n17_finder_links_terms2`
---
-ALTER TABLE `x8n17_finder_links_terms2`
-  ADD PRIMARY KEY (`link_id`,`term_id`),
-  ADD KEY `idx_term_weight` (`term_id`,`weight`),
-  ADD KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`);
-
---
--- Index pour la table `x8n17_finder_links_terms3`
---
-ALTER TABLE `x8n17_finder_links_terms3`
-  ADD PRIMARY KEY (`link_id`,`term_id`),
-  ADD KEY `idx_term_weight` (`term_id`,`weight`),
-  ADD KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`);
-
---
--- Index pour la table `x8n17_finder_links_terms4`
---
-ALTER TABLE `x8n17_finder_links_terms4`
-  ADD PRIMARY KEY (`link_id`,`term_id`),
-  ADD KEY `idx_term_weight` (`term_id`,`weight`),
-  ADD KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`);
-
---
--- Index pour la table `x8n17_finder_links_terms5`
---
-ALTER TABLE `x8n17_finder_links_terms5`
-  ADD PRIMARY KEY (`link_id`,`term_id`),
-  ADD KEY `idx_term_weight` (`term_id`,`weight`),
-  ADD KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`);
-
---
--- Index pour la table `x8n17_finder_links_terms6`
---
-ALTER TABLE `x8n17_finder_links_terms6`
-  ADD PRIMARY KEY (`link_id`,`term_id`),
-  ADD KEY `idx_term_weight` (`term_id`,`weight`),
-  ADD KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`);
-
---
--- Index pour la table `x8n17_finder_links_terms7`
---
-ALTER TABLE `x8n17_finder_links_terms7`
-  ADD PRIMARY KEY (`link_id`,`term_id`),
-  ADD KEY `idx_term_weight` (`term_id`,`weight`),
-  ADD KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`);
-
---
--- Index pour la table `x8n17_finder_links_terms8`
---
-ALTER TABLE `x8n17_finder_links_terms8`
-  ADD PRIMARY KEY (`link_id`,`term_id`),
-  ADD KEY `idx_term_weight` (`term_id`,`weight`),
-  ADD KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`);
-
---
--- Index pour la table `x8n17_finder_links_terms9`
---
-ALTER TABLE `x8n17_finder_links_terms9`
-  ADD PRIMARY KEY (`link_id`,`term_id`),
-  ADD KEY `idx_term_weight` (`term_id`,`weight`),
-  ADD KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`);
-
---
--- Index pour la table `x8n17_finder_links_termsa`
---
-ALTER TABLE `x8n17_finder_links_termsa`
-  ADD PRIMARY KEY (`link_id`,`term_id`),
-  ADD KEY `idx_term_weight` (`term_id`,`weight`),
-  ADD KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`);
-
---
--- Index pour la table `x8n17_finder_links_termsb`
---
-ALTER TABLE `x8n17_finder_links_termsb`
-  ADD PRIMARY KEY (`link_id`,`term_id`),
-  ADD KEY `idx_term_weight` (`term_id`,`weight`),
-  ADD KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`);
-
---
--- Index pour la table `x8n17_finder_links_termsc`
---
-ALTER TABLE `x8n17_finder_links_termsc`
-  ADD PRIMARY KEY (`link_id`,`term_id`),
-  ADD KEY `idx_term_weight` (`term_id`,`weight`),
-  ADD KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`);
-
---
--- Index pour la table `x8n17_finder_links_termsd`
---
-ALTER TABLE `x8n17_finder_links_termsd`
-  ADD PRIMARY KEY (`link_id`,`term_id`),
-  ADD KEY `idx_term_weight` (`term_id`,`weight`),
-  ADD KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`);
-
---
--- Index pour la table `x8n17_finder_links_termse`
---
-ALTER TABLE `x8n17_finder_links_termse`
-  ADD PRIMARY KEY (`link_id`,`term_id`),
-  ADD KEY `idx_term_weight` (`term_id`,`weight`),
-  ADD KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`);
-
---
--- Index pour la table `x8n17_finder_links_termsf`
---
-ALTER TABLE `x8n17_finder_links_termsf`
-  ADD PRIMARY KEY (`link_id`,`term_id`),
-  ADD KEY `idx_term_weight` (`term_id`,`weight`),
-  ADD KEY `idx_link_term_weight` (`link_id`,`term_id`,`weight`);
-
---
--- Index pour la table `x8n17_finder_taxonomy`
---
-ALTER TABLE `x8n17_finder_taxonomy`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `parent_id` (`parent_id`),
-  ADD KEY `state` (`state`),
-  ADD KEY `ordering` (`ordering`),
-  ADD KEY `access` (`access`),
-  ADD KEY `idx_parent_published` (`parent_id`,`state`,`access`);
-
---
--- Index pour la table `x8n17_finder_taxonomy_map`
---
-ALTER TABLE `x8n17_finder_taxonomy_map`
-  ADD PRIMARY KEY (`link_id`,`node_id`),
-  ADD KEY `link_id` (`link_id`),
-  ADD KEY `node_id` (`node_id`);
-
---
--- Index pour la table `x8n17_finder_terms`
---
-ALTER TABLE `x8n17_finder_terms`
-  ADD PRIMARY KEY (`term_id`),
-  ADD UNIQUE KEY `idx_term` (`term`),
-  ADD KEY `idx_term_phrase` (`term`,`phrase`),
-  ADD KEY `idx_stem_phrase` (`stem`,`phrase`),
-  ADD KEY `idx_soundex_phrase` (`soundex`,`phrase`);
-
---
--- Index pour la table `x8n17_finder_terms_common`
---
-ALTER TABLE `x8n17_finder_terms_common`
-  ADD KEY `idx_word_lang` (`term`,`language`),
-  ADD KEY `idx_lang` (`language`);
-
---
--- Index pour la table `x8n17_finder_tokens`
---
-ALTER TABLE `x8n17_finder_tokens`
-  ADD KEY `idx_word` (`term`),
-  ADD KEY `idx_context` (`context`);
-
---
--- Index pour la table `x8n17_finder_tokens_aggregate`
---
-ALTER TABLE `x8n17_finder_tokens_aggregate`
-  ADD KEY `token` (`term`),
-  ADD KEY `keyword_id` (`term_id`);
-
---
--- Index pour la table `x8n17_finder_types`
---
-ALTER TABLE `x8n17_finder_types`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `title` (`title`);
-
---
--- Index pour la table `x8n17_komento_acl`
---
-ALTER TABLE `x8n17_komento_acl`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `komento_acl_content_type` (`type`);
-
---
--- Index pour la table `x8n17_komento_actions`
---
-ALTER TABLE `x8n17_komento_actions`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `komento_actions` (`type`,`comment_id`,`action_by`),
-  ADD KEY `komento_actions_comment_id` (`comment_id`);
-
---
--- Index pour la table `x8n17_komento_activities`
---
-ALTER TABLE `x8n17_komento_activities`
-  ADD PRIMARY KEY (`id`);
-
---
--- Index pour la table `x8n17_komento_captcha`
---
-ALTER TABLE `x8n17_komento_captcha`
-  ADD PRIMARY KEY (`id`);
-
---
--- Index pour la table `x8n17_komento_comments`
---
-ALTER TABLE `x8n17_komento_comments`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `komento_threaded` (`component`,`cid`,`published`,`lft`,`rgt`),
-  ADD KEY `komento_threaded_reverse` (`component`,`cid`,`published`,`rgt`),
-  ADD KEY `komento_module_comments` (`component`,`cid`,`published`,`created`),
-  ADD KEY `komento_backend` (`parent_id`,`created`);
-
---
--- Index pour la table `x8n17_komento_hashkeys`
---
-ALTER TABLE `x8n17_komento_hashkeys`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `uid` (`uid`),
-  ADD KEY `type` (`type`);
-
---
--- Index pour la table `x8n17_komento_ipfilter`
---
-ALTER TABLE `x8n17_komento_ipfilter`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `komento_ipfilter` (`component`,`ip`);
-
---
--- Index pour la table `x8n17_komento_mailq`
---
-ALTER TABLE `x8n17_komento_mailq`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `komento_mailq_status` (`status`);
-
---
--- Index pour la table `x8n17_komento_subscription`
---
-ALTER TABLE `x8n17_komento_subscription`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `komento_subscription` (`type`,`component`,`cid`);
-
---
--- Index pour la table `x8n17_komento_uploads`
---
-ALTER TABLE `x8n17_komento_uploads`
-  ADD PRIMARY KEY (`id`);
-
---
--- Index pour la table `x8n17_languages`
---
-ALTER TABLE `x8n17_languages`
-  ADD PRIMARY KEY (`lang_id`),
-  ADD UNIQUE KEY `idx_sef` (`sef`),
-  ADD UNIQUE KEY `idx_image` (`image`),
-  ADD UNIQUE KEY `idx_langcode` (`lang_code`),
-  ADD KEY `idx_access` (`access`),
-  ADD KEY `idx_ordering` (`ordering`);
-
---
--- Index pour la table `x8n17_menu`
---
-ALTER TABLE `x8n17_menu`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `idx_client_id_parent_id_alias_language` (`client_id`,`parent_id`,`alias`,`language`),
-  ADD KEY `idx_componentid` (`component_id`,`menutype`,`published`,`access`),
-  ADD KEY `idx_menutype` (`menutype`),
-  ADD KEY `idx_left_right` (`lft`,`rgt`),
-  ADD KEY `idx_alias` (`alias`),
-  ADD KEY `idx_path` (`path`(255)),
-  ADD KEY `idx_language` (`language`);
-
---
--- Index pour la table `x8n17_menu_types`
---
-ALTER TABLE `x8n17_menu_types`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `idx_menutype` (`menutype`);
-
---
--- Index pour la table `x8n17_messages`
---
-ALTER TABLE `x8n17_messages`
-  ADD PRIMARY KEY (`message_id`),
-  ADD KEY `useridto_state` (`user_id_to`,`state`);
-
---
--- Index pour la table `x8n17_messages_cfg`
---
-ALTER TABLE `x8n17_messages_cfg`
-  ADD UNIQUE KEY `idx_user_var_name` (`user_id`,`cfg_name`);
-
---
--- Index pour la table `x8n17_modules`
---
-ALTER TABLE `x8n17_modules`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `published` (`published`,`access`),
-  ADD KEY `newsfeeds` (`module`,`published`),
-  ADD KEY `idx_language` (`language`);
-
---
--- Index pour la table `x8n17_modules_menu`
---
-ALTER TABLE `x8n17_modules_menu`
-  ADD PRIMARY KEY (`moduleid`,`menuid`);
-
---
--- Index pour la table `x8n17_newsfeeds`
---
-ALTER TABLE `x8n17_newsfeeds`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_access` (`access`),
-  ADD KEY `idx_checkout` (`checked_out`),
-  ADD KEY `idx_state` (`published`),
-  ADD KEY `idx_catid` (`catid`),
-  ADD KEY `idx_createdby` (`created_by`),
-  ADD KEY `idx_language` (`language`),
-  ADD KEY `idx_xreference` (`xreference`);
-
---
--- Index pour la table `x8n17_overrider`
---
-ALTER TABLE `x8n17_overrider`
-  ADD PRIMARY KEY (`id`);
-
---
--- Index pour la table `x8n17_postinstall_messages`
---
-ALTER TABLE `x8n17_postinstall_messages`
-  ADD PRIMARY KEY (`postinstall_message_id`);
-
---
--- Index pour la table `x8n17_redirect_links`
---
-ALTER TABLE `x8n17_redirect_links`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `idx_link_old` (`old_url`),
-  ADD KEY `idx_link_modifed` (`modified_date`);
-
---
--- Index pour la table `x8n17_schemas`
---
-ALTER TABLE `x8n17_schemas`
-  ADD PRIMARY KEY (`extension_id`,`version_id`);
-
---
--- Index pour la table `x8n17_session`
---
-ALTER TABLE `x8n17_session`
-  ADD PRIMARY KEY (`session_id`),
-  ADD KEY `userid` (`userid`),
-  ADD KEY `time` (`time`);
-
---
--- Index pour la table `x8n17_tags`
---
-ALTER TABLE `x8n17_tags`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `tag_idx` (`published`,`access`),
-  ADD KEY `idx_access` (`access`),
-  ADD KEY `idx_checkout` (`checked_out`),
-  ADD KEY `idx_path` (`path`),
-  ADD KEY `idx_left_right` (`lft`,`rgt`),
-  ADD KEY `idx_alias` (`alias`),
-  ADD KEY `idx_language` (`language`);
-
---
--- Index pour la table `x8n17_template_styles`
---
-ALTER TABLE `x8n17_template_styles`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_template` (`template`),
-  ADD KEY `idx_home` (`home`);
-
---
--- Index pour la table `x8n17_ucm_base`
---
-ALTER TABLE `x8n17_ucm_base`
-  ADD PRIMARY KEY (`ucm_id`),
-  ADD KEY `idx_ucm_item_id` (`ucm_item_id`),
-  ADD KEY `idx_ucm_type_id` (`ucm_type_id`),
-  ADD KEY `idx_ucm_language_id` (`ucm_language_id`);
-
---
--- Index pour la table `x8n17_ucm_content`
---
-ALTER TABLE `x8n17_ucm_content`
-  ADD PRIMARY KEY (`core_content_id`),
-  ADD KEY `tag_idx` (`core_state`,`core_access`),
-  ADD KEY `idx_access` (`core_access`),
-  ADD KEY `idx_alias` (`core_alias`),
-  ADD KEY `idx_language` (`core_language`),
-  ADD KEY `idx_title` (`core_title`),
-  ADD KEY `idx_modified_time` (`core_modified_time`),
-  ADD KEY `idx_created_time` (`core_created_time`),
-  ADD KEY `idx_content_type` (`core_type_alias`),
-  ADD KEY `idx_core_modified_user_id` (`core_modified_user_id`),
-  ADD KEY `idx_core_checked_out_user_id` (`core_checked_out_user_id`),
-  ADD KEY `idx_core_created_user_id` (`core_created_user_id`),
-  ADD KEY `idx_core_type_id` (`core_type_id`);
-
---
--- Index pour la table `x8n17_ucm_history`
---
-ALTER TABLE `x8n17_ucm_history`
-  ADD PRIMARY KEY (`version_id`),
-  ADD KEY `idx_ucm_item_id` (`ucm_type_id`,`ucm_item_id`),
-  ADD KEY `idx_save_date` (`save_date`);
-
---
--- Index pour la table `x8n17_updates`
---
-ALTER TABLE `x8n17_updates`
-  ADD PRIMARY KEY (`update_id`);
-
---
--- Index pour la table `x8n17_update_sites`
---
-ALTER TABLE `x8n17_update_sites`
-  ADD PRIMARY KEY (`update_site_id`);
-
---
--- Index pour la table `x8n17_update_sites_extensions`
---
-ALTER TABLE `x8n17_update_sites_extensions`
-  ADD PRIMARY KEY (`update_site_id`,`extension_id`);
-
---
--- Index pour la table `x8n17_usergroups`
---
-ALTER TABLE `x8n17_usergroups`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `idx_usergroup_parent_title_lookup` (`parent_id`,`title`),
-  ADD KEY `idx_usergroup_title_lookup` (`title`),
-  ADD KEY `idx_usergroup_adjacency_lookup` (`parent_id`),
-  ADD KEY `idx_usergroup_nested_set_lookup` (`lft`,`rgt`) USING BTREE;
-
---
--- Index pour la table `x8n17_users`
---
-ALTER TABLE `x8n17_users`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_name` (`name`),
-  ADD KEY `idx_block` (`block`),
-  ADD KEY `username` (`username`),
-  ADD KEY `email` (`email`);
-
---
--- Index pour la table `x8n17_user_keys`
---
-ALTER TABLE `x8n17_user_keys`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `series` (`series`),
-  ADD UNIQUE KEY `series_2` (`series`),
-  ADD UNIQUE KEY `series_3` (`series`),
-  ADD KEY `user_id` (`user_id`);
-
---
--- Index pour la table `x8n17_user_notes`
---
-ALTER TABLE `x8n17_user_notes`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_user_id` (`user_id`),
-  ADD KEY `idx_category_id` (`catid`);
-
---
--- Index pour la table `x8n17_user_profiles`
---
-ALTER TABLE `x8n17_user_profiles`
-  ADD UNIQUE KEY `idx_user_id_profile_key` (`user_id`,`profile_key`);
-
---
--- Index pour la table `x8n17_user_usergroup_map`
---
-ALTER TABLE `x8n17_user_usergroup_map`
-  ADD PRIMARY KEY (`user_id`,`group_id`);
-
---
--- Index pour la table `x8n17_viewlevels`
---
-ALTER TABLE `x8n17_viewlevels`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `idx_assetgroup_title_lookup` (`title`);
-
---
--- AUTO_INCREMENT pour les tables exportées
---
-
---
--- AUTO_INCREMENT pour la table `x8n17_assets`
---
-ALTER TABLE `x8n17_assets`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Primary Key', AUTO_INCREMENT=104;
---
--- AUTO_INCREMENT pour la table `x8n17_banners`
---
-ALTER TABLE `x8n17_banners`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
---
--- AUTO_INCREMENT pour la table `x8n17_banner_clients`
---
-ALTER TABLE `x8n17_banner_clients`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
---
--- AUTO_INCREMENT pour la table `x8n17_categories`
---
-ALTER TABLE `x8n17_categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
---
--- AUTO_INCREMENT pour la table `x8n17_contact_details`
---
-ALTER TABLE `x8n17_contact_details`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
---
--- AUTO_INCREMENT pour la table `x8n17_content`
---
-ALTER TABLE `x8n17_content`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
---
--- AUTO_INCREMENT pour la table `x8n17_content_types`
---
-ALTER TABLE `x8n17_content_types`
-  MODIFY `type_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
---
--- AUTO_INCREMENT pour la table `x8n17_extensions`
---
-ALTER TABLE `x8n17_extensions`
-  MODIFY `extension_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10021;
---
--- AUTO_INCREMENT pour la table `x8n17_finder_filters`
---
-ALTER TABLE `x8n17_finder_filters`
-  MODIFY `filter_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
---
--- AUTO_INCREMENT pour la table `x8n17_finder_links`
---
-ALTER TABLE `x8n17_finder_links`
-  MODIFY `link_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
---
--- AUTO_INCREMENT pour la table `x8n17_finder_taxonomy`
---
-ALTER TABLE `x8n17_finder_taxonomy`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
---
--- AUTO_INCREMENT pour la table `x8n17_finder_terms`
---
-ALTER TABLE `x8n17_finder_terms`
-  MODIFY `term_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
---
--- AUTO_INCREMENT pour la table `x8n17_finder_types`
---
-ALTER TABLE `x8n17_finder_types`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
---
--- AUTO_INCREMENT pour la table `x8n17_komento_acl`
---
-ALTER TABLE `x8n17_komento_acl`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
---
--- AUTO_INCREMENT pour la table `x8n17_komento_actions`
---
-ALTER TABLE `x8n17_komento_actions`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
---
--- AUTO_INCREMENT pour la table `x8n17_komento_activities`
---
-ALTER TABLE `x8n17_komento_activities`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
---
--- AUTO_INCREMENT pour la table `x8n17_komento_captcha`
---
-ALTER TABLE `x8n17_komento_captcha`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
---
--- AUTO_INCREMENT pour la table `x8n17_komento_comments`
---
-ALTER TABLE `x8n17_komento_comments`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
---
--- AUTO_INCREMENT pour la table `x8n17_komento_hashkeys`
---
-ALTER TABLE `x8n17_komento_hashkeys`
-  MODIFY `id` bigint(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
---
--- AUTO_INCREMENT pour la table `x8n17_komento_ipfilter`
---
-ALTER TABLE `x8n17_komento_ipfilter`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
---
--- AUTO_INCREMENT pour la table `x8n17_komento_mailq`
---
-ALTER TABLE `x8n17_komento_mailq`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
---
--- AUTO_INCREMENT pour la table `x8n17_komento_subscription`
---
-ALTER TABLE `x8n17_komento_subscription`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
---
--- AUTO_INCREMENT pour la table `x8n17_komento_uploads`
---
-ALTER TABLE `x8n17_komento_uploads`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
---
--- AUTO_INCREMENT pour la table `x8n17_languages`
---
-ALTER TABLE `x8n17_languages`
-  MODIFY `lang_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
---
--- AUTO_INCREMENT pour la table `x8n17_menu`
---
-ALTER TABLE `x8n17_menu`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=128;
---
--- AUTO_INCREMENT pour la table `x8n17_menu_types`
---
-ALTER TABLE `x8n17_menu_types`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
---
--- AUTO_INCREMENT pour la table `x8n17_messages`
---
-ALTER TABLE `x8n17_messages`
-  MODIFY `message_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
---
--- AUTO_INCREMENT pour la table `x8n17_modules`
---
-ALTER TABLE `x8n17_modules`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=102;
---
--- AUTO_INCREMENT pour la table `x8n17_newsfeeds`
---
-ALTER TABLE `x8n17_newsfeeds`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
---
--- AUTO_INCREMENT pour la table `x8n17_overrider`
---
-ALTER TABLE `x8n17_overrider`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT COMMENT 'Primary Key';
---
--- AUTO_INCREMENT pour la table `x8n17_postinstall_messages`
---
-ALTER TABLE `x8n17_postinstall_messages`
-  MODIFY `postinstall_message_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
---
--- AUTO_INCREMENT pour la table `x8n17_redirect_links`
---
-ALTER TABLE `x8n17_redirect_links`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
---
--- AUTO_INCREMENT pour la table `x8n17_tags`
---
-ALTER TABLE `x8n17_tags`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
---
--- AUTO_INCREMENT pour la table `x8n17_template_styles`
---
-ALTER TABLE `x8n17_template_styles`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
---
--- AUTO_INCREMENT pour la table `x8n17_ucm_content`
---
-ALTER TABLE `x8n17_ucm_content`
-  MODIFY `core_content_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
---
--- AUTO_INCREMENT pour la table `x8n17_ucm_history`
---
-ALTER TABLE `x8n17_ucm_history`
-  MODIFY `version_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
---
--- AUTO_INCREMENT pour la table `x8n17_updates`
---
-ALTER TABLE `x8n17_updates`
-  MODIFY `update_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
---
--- AUTO_INCREMENT pour la table `x8n17_update_sites`
---
-ALTER TABLE `x8n17_update_sites`
-  MODIFY `update_site_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
---
--- AUTO_INCREMENT pour la table `x8n17_usergroups`
---
-ALTER TABLE `x8n17_usergroups`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Primary Key', AUTO_INCREMENT=10;
---
--- AUTO_INCREMENT pour la table `x8n17_users`
---
-ALTER TABLE `x8n17_users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=193;
---
--- AUTO_INCREMENT pour la table `x8n17_user_keys`
---
-ALTER TABLE `x8n17_user_keys`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
---
--- AUTO_INCREMENT pour la table `x8n17_user_notes`
---
-ALTER TABLE `x8n17_user_notes`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
---
--- AUTO_INCREMENT pour la table `x8n17_viewlevels`
---
-ALTER TABLE `x8n17_viewlevels`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Primary Key', AUTO_INCREMENT=7;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

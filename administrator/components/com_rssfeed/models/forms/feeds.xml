@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fieldset addfieldpath="/administrator/components/com_categories/models/fields">
+		<field 
+			name="id"
+			type="text"
+			label="COM_RSSFEED_FEED_FIELD_ID_LABEL"
+			description="COM_RSSFEED_FEED_FIELD_ID_DESC"
+			maxlength="10"
+			filter="INTEGER"
+			class="readonly"
+			readonly="true"
+		/>
+		<field
+			name="alias"
+			type="text"
+			label="JFIELD_ALIAS_LABEL"
+			description="JFIELD_ALIAS_DESC"
+			hint="JFIELD_ALIAS_PLACEHOLDER"
+			class="inputbox" size="40"
+		/>
+		<field
+			name="catid"
+			type="categoryedit"
+			extension="com_rssfeed"
+			label="JCATEGORY"
+			description="JFIELD_CATEGORY_DESC"
+			class="inputbox"
+			required="true"
+		/>
+		<field
+			name="created"
+			type="calendar"
+			label="JGLOBAL_FIELD_CREATED_LABEL"
+			description="JGLOBAL_FIELD_CREATED_DESC"
+			class="readonly"
+		/>
+		<field
+			name="created_by"
+			type="user"
+			label="JGLOBAL_FIELD_CREATED_BY_LABEL"
+			description="JGLOBAL_FIELD_CREATED_BY_DESC"
+		/>
+		<field
+			name="publish_up"
+			type="calendar"
+			label="JGLOBAL_FIELD_PUBLISH_UP_LABEL"
+			description="JGLOBAL_FIELD_PUBLISH_UP_DESC"
+			class="inputbox" format="%Y-%m-%d %H:%M:%S"
+			labelclass="control-label"
+			filter="user_utc"
+		/>
+		<field
+			name="publish_down"
+			type="calendar"
+			label="JGLOBAL_FIELD_PUBLISH_DOWN_LABEL"
+			description="JGLOBAL_FIELD_PUBLISH_DOWN_DESC"
+			class="inputbox"
+			format="%Y-%m-%d %H:%M:%S"
+			labelclass="control-label"
+			filter="user_utc"
+		/>
+	</fieldset>
+</form>

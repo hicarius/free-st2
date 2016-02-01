@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="component" version="3.4" method="upgrade">
+	<name>com_rssfeed</name>
+	<creationDate>2016 february 01</creationDate>
+	<author></author>
+	<authorEmail></authorEmail>
+	<authorUrl></authorUrl>
+	<copyright></copyright>
+	<license></license>
+	<version>1.0.0</version>
+	<description>COM_RSSFEED_XML_DESCRIPTION</description>
+	
+	<install>
+		<sql>
+			<file driver="mysql" charset="utf8">sql/install.mysql.utf8.sql</file>
+		</sql>
+	</install>
+	<uninstall>
+		<sql>
+			<file driver="mysql" charset="utf8">sql/uninstall.mysql.utf8.sql</file>
+		</sql>
+	</uninstall>
+	<update>
+		<schemas>
+			<schemapath type="mysql">sql/updates</schemapath>
+		</schemas>
+	</update>
+	
+	<administration>
+		<menu link="index.php?option=com_rssfeed">Rssfeed</menu>
+		<submenu>
+			<menu link="option=com_rssfeed&amp;view=feedss">Feedss</menu>
+			<menu link="option=com_categories&amp;view=categories&amp;extension=com_rssfeed">JCATEGORIES</menu>
+		</submenu>
+		<files folder="admin">
+			<filename>access.xml</filename>
+			<filename>config.xml</filename>
+			<filename>controller.php</filename>
+			<filename>index.html</filename>
+			<filename>rssfeed.php</filename>
+			<folder>controllers</folder>
+			<folder>helpers</folder>
+			<folder>models</folder>
+			<folder>tables</folder>
+			<folder>sql</folder>
+			<folder>views</folder>
+		</files>
+		<languages folder="admin">
+			<language tag="fr-FR">language/fr-FR.com_rssfeed.ini</language>
+			<language tag="fr-FR">language/fr-FR.com_rssfeed.sys.ini</language>
+		</languages>
+	</administration>
+	
+	<updateservers>
+	</updateservers>
+</extension>

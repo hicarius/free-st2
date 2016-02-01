@@ -19,8 +19,8 @@ class RssfeedHelper
 	{
 		JHtmlSidebar::addEntry(
 			JText::_('COM_RSSFEED_SUBMENU_FEED'), 
-			'index.php?option=com_rssfeed&view=feedss', 
-			$vName == 'feedss'
+			'index.php?option=com_rssfeed&view=feeds', 
+			$vName == 'feeds'
 		);
 
 		JHtmlSidebar::addEntry(

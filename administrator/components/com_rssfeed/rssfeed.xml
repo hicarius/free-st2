@@ -29,7 +29,7 @@
 	<administration>
 		<menu link="index.php?option=com_rssfeed">Rssfeed</menu>
 		<submenu>
-			<menu link="option=com_rssfeed&amp;view=feedss">Feedss</menu>
+			<menu link="option=com_rssfeed&amp;view=feeds">Feeds</menu>
 			<menu link="option=com_categories&amp;view=categories&amp;extension=com_rssfeed">JCATEGORIES</menu>
 		</submenu>
 		<files folder="admin">

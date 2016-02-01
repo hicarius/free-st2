@@ -8,251 +8,216 @@
 defined("_JEXEC") or die("Restricted access");
 
 /**
- * Item Model for feeds.
+ * List Model for feeds.
  *
  * @package     Rssfeed
  * @subpackage  Models
  */
-class RssfeedModelFeeds extends JModelAdmin
+class RssfeedModelFeeds extends JModelList
 {
 	/**
-	 * @var        string    The prefix to use with controller messages.
-	 * @since   1.6
-	 */
-	protected $text_prefix = 'COM_RSSFEED';
-
-	/**
-	 * The type alias for this content type.
+	 * Constructor.
 	 *
-	 * @var      string
-	 * @since    3.2
+	 * @param   array  $config  An optional associative array of configuration settings.
 	 */
-	public $typeAlias = 'com_rssfeed.feeds';
-
-	/**
-	 * Method to test whether a record can be deleted.
-	 *
-	 * @param   object    $record    A record object.
-	 *
-	 * @return  boolean  True if allowed to delete the record. Defaults to the permission set in the component.
-	 * @since   1.6
-	 */
-	protected function canDelete($record)
+	public function __construct($config = array())
 	{
-		if (!empty($record->id))
+		if (empty($config['filter_fields']))
 		{
-
-			$user = JFactory::getUser();
-			return $user->authorise('core.delete', $this->typeAlias . '.' . (int) $record->id);
+			$config['filter_fields'] = array(
+				'a.id', 'id',
+				'a.alias', 'alias',
+				'a.catid', 'catid', 'category_id', 'category_title',
+				'a.created', 'created',
+				'a.created_by', 'created_by', 'author_id',
+				'a.publish_up', 'publish_up',
+				'a.publish_down', 'publish_down','ordering', 'state'
+			);
 		}
-	}		
-
-	/**
-	 * Prepare and sanitise the table data prior to saving.
-	 *
-	 * @param   JTable    A JTable object.
-	 *
-	 * @return  void
-	 * @since   1.6
-	 */
-	protected function prepareTable($table)
-	{
-		// Set the publish date to now
-		$db = $this->getDbo();
+		parent::__construct($config);
 	}
-
+	
 	/**
-	 * Auto-populate the model state.
+	 * Method to auto-populate the model state.
+	 *
+	 * This method should only be called once per instantiation and is designed
+	 * to be called on the first call to the getState() method unless the model
+	 * configuration flag to ignore the request is set.
 	 *
 	 * Note. Calling getState in this method will result in recursion.
 	 *
-	 * @return  void
+	 * @param   string  $ordering   An optional ordering field.
+	 * @param   string  $direction  An optional direction (asc|desc).
 	 *
-	 * @since   1.6
+	 * @return  void
 	 */
-	protected function populateState()
+	protected function populateState($ordering = 'id', $direction = 'ASC')
 	{
-		$app = JFactory::getApplication('administrator');
+		// Get the Application
+		$app = JFactory::getApplication();
+		
+		// Set filter state for search
+        $search = $app->getUserStateFromRequest($this->context . '.filter.search', 'filter_search');
+        $this->setState('filter.search', $search);
 
-		// Load the User state.
-		$pk = $app->input->getInt('id');
-		$this->setState($this->getName() . '.id', $pk);
+		// Set filter state for author
+		$authorId = $app->getUserStateFromRequest($this->context . '.filter.author_id', 'filter_author_id');
+		$this->setState('filter.author_id', $authorId);
+
+		// Set filter state for category
+		$categoryId = $this->getUserStateFromRequest($this->context . '.filter.category_id', 'filter_category_id');
+		$this->setState('filter.category_id', $categoryId);
 
 		// Load the parameters.
 		$params = JComponentHelper::getParams('com_rssfeed');
 		$this->setState('params', $params);
+
+		// List state information.
+		parent::populateState($ordering, $direction);
+	}
+	
+	/**
+	 * Method to get a store id based on model configuration state.
+	 *
+	 * This is necessary because the model is used by the component and
+	 * different modules that might need different sets of data or different
+	 * ordering requirements.
+	 *
+	 * @param   string  $id  A prefix for the store id.
+	 *
+	 * @return  string  A store id.
+	 *
+	 * @since   1.6
+	 */
+	protected function getStoreId($id = '')
+	{
+		// Compile the store id.
+		$id .= ':' . $this->getState('filter.search');
+		$id .= ':' . $this->getState('filter.category_id');
+		$id .= ':' . $this->getState('filter.author_id');
+
+		return parent::getStoreId($id);
 	}
 
 	/**
-	 * Method to perform batch operations on an item or a set of items.
+	 * Build an SQL query to load the list data.
 	 *
-	 * @param   array  $commands  An array of commands to perform.
-	 * @param   array  $pks       An array of item ids.
-	 * @param   array  $contexts  An array of item contexts.
+	 * @return  JDatabaseQuery
+	 */
+	protected function getListQuery()
+	{
+		// Get database object
+		$db = $this->getDbo();
+		$query = $db->getQuery(true);
+		$query->select('a.*')->from('#__feed AS a');
+			
+		// Join over the categories.
+		$query->select('c.title AS category_title, c.path AS category_route, c.access AS category_access, c.alias AS category_alias')
+			->join('LEFT', '#__categories AS c ON c.id = a.catid');
+		
+		// Join over the users for the author.
+		$query->select('ua.name AS author_name')
+			->join('LEFT', '#__users AS ua ON ua.id = a.created_by');
+
+		// Filter by search
+		$search = $this->getState('filter.search');
+		$s = $db->quote('%'.$db->escape($search, true).'%');
+		
+		if (!empty($search))
+		{
+			if (stripos($search, 'id:') === 0)
+			{
+				$query->where('a.id = ' . (int) substr($search, strlen('id:')));
+			}
+			elseif (stripos($search, 'id:') === 0)
+			{
+				$search = $db->quote('%' . $db->escape(substr($search, strlen('id:')), true) . '%');
+				$query->where('(a.id LIKE ' . $search);
+			}
+			elseif (stripos($search, 'author:') === 0)
+			{
+				$search = $db->quote('%' . $db->escape(substr($search, 7), true) . '%');
+				$query->where('(ua.name LIKE ' . $search . ' OR ua.username LIKE ' . $search . ')');
+			}
+			else
+			{
+				$search = $db->quote('%' . $db->escape($search, true) . '%');
+				
+			}
+		}
+		
+		// Filter by category
+		$categoryId = $this->getState('filter.category_id');
+		if (is_numeric($categoryId))
+		{
+			$query->where('a.catid = '.(int) $categoryId);
+		}
+		
+		// Filter by author
+		$authorId = $this->getState('filter.author_id');
+		if (is_numeric($authorId))
+		{
+			$type = $this->getState('filter.author_id.include', true) ? '= ' : '<>';
+			$query->where('a.created_by ' . $type . (int) $authorId);
+		}
+		
+		// Implement View Level Access
+		$user = JFactory::getUser();
+		if (!$user->authorise('core.admin'))
+		{
+			$groups = implode(',', $user->getAuthorisedViewLevels());
+			$query->where('c.access IN (' . $groups . ')');
+		}
+		
+		// Add list oredring and list direction to SQL query
+		$sort = $this->getState('list.ordering', 'id');
+		$order = $this->getState('list.direction', 'ASC');
+		$query->order($db->escape($sort).' '.$db->escape($order));
+		
+		return $query;
+	}
+	
+	/**
+	 * Build a list of authors
 	 *
-	 * @return  boolean  Returns true on success, false on failure.
+	 * @return  array
+	 *
+	 * @since   1.6
+	 */
+	public function getAuthors()
+	{
+		// Create a new query object.
+		$db = $this->getDbo();
+		$query = $db->getQuery(true);
+
+		// Construct the query
+		$query->select('u.id AS value, u.name AS text')
+			->from('#__users AS u')
+			->join('INNER', '#__feed AS a ON a.created_by = u.id')
+			->group('u.id, u.name')
+			->order('u.name');
+
+		// Setup the query
+		$db->setQuery($query);
+
+		// Return the result
+		return $db->loadObjectList();
+	}
+	
+	/**
+	 * Method to get an array of data items.
+	 *
+	 * @return  mixed  An array of data items on success, false on failure.
 	 *
 	 * @since   12.2
 	 */
-	public function batch($commands, $pks, $contexts)
+	public function getItems()
 	{
-		// Sanitize ids.
-		$pks = array_unique($pks);
-		JArrayHelper::toInteger($pks);
-
-		// Remove any values of zero.
-		if (array_search(0, $pks, true))
-		{
-			unset($pks[array_search(0, $pks, true)]);
+		if ($items = parent::getItems()) {
+			//Do any procesing on fields here if needed
 		}
 
-		if (empty($pks))
-		{
-			$this->setError(JText::_('JGLOBAL_NO_ITEM_SELECTED'));
-			return false;
-		}
-
-		$done = false;
-
-		// Set some needed variables.
-		$this->user = JFactory::getUser();
-		$this->table = $this->getTable();
-		$this->tableClassName = get_class($this->table);
-		$this->contentType = new JUcmType;
-		$this->type = $this->contentType->getTypeByTable($this->tableClassName);
-		$this->batchSet = true;
-
-		if ($this->type == false)
-		{
-			$type = new JUcmType;
-			$this->type = $type->getTypeByAlias($this->typeAlias);
-
-		}
-		if ($this->type === false)
-		{
-			$type = new JUcmType;
-			$this->type = $type->getTypeByAlias($this->typeAlias);
-			$typeAlias = $this->type->type_alias;
-		}
-		else
-		{
-			$typeAlias = $this->type->type_alias;
-		}
-		$this->tagsObserver = $this->table->getObserverOfClass('JTableObserverTags');
-
-		if (!empty($commands['category_id']))
-		{
-			$cmd = JArrayHelper::getValue($commands, 'move_copy', 'c');
-
-			if ($cmd == 'c')
-			{
-				$result = $this->batchCopy($commands['category_id'], $pks, $contexts);
-
-				if (is_array($result))
-				{
-					$pks = $result;
-				}
-				else
-				{
-					return false;
-				}
-			}
-			elseif ($cmd == 'm' && !$this->batchMove($commands['category_id'], $pks, $contexts))
-			{
-				return false;
-			}
-
-			$done = true;
-		}
-
-		if (!$done)
-		{
-			$this->setError(JText::_('JLIB_APPLICATION_ERROR_INSUFFICIENT_BATCH_INFORMATION'));
-			return false;
-		}
-
-		// Clear the cache
-		$this->cleanCache();
-
-		return true;
-	}
-	
-	/**
-	 * Alias for JTable::getInstance()
-	 *
-	 * @param   string  $type    The type (name) of the JTable class to get an instance of.
-	 * @param   string  $prefix  An optional prefix for the table class name.
-	 * @param   array   $config  An optional array of configuration values for the JTable object.
-	 *
-	 * @return  mixed    A JTable object if found or boolean false if one could not be found.
-	 */
-	public function getTable($type = 'Feeds', $prefix = 'RssfeedTable', $config = array())
-	{
-		return JTable::getInstance($type, $prefix, $config);
-	}
-	
-	/**
-	 * Method for getting the form from the model.
-	 *
-	 * @param   array    $data      Data for the form.
-	 * @param   boolean  $loadData  True if the form is to load its own data (default case), false if not.
-	 *
-	 * @return  mixed  A JForm object on success, false on failure
-	 */
-	public function getForm($data = array(), $loadData = true)
-	{
-		JForm::addRulePath(JPATH_COMPONENT_ADMINISTRATOR.'/models/rules');		
-		
-		$options = array('control' => 'jform', 'load_data' => $loadData);
-		$form = $this->loadForm($this->typeAlias, $this->name, $options);
-		
-		if(empty($form))
-		{
-			return false;
-		}
-
-		return $form;
-	}
-	
-	/**
-	 * Method to get the data that should be injected in the form.
-	 *
-	 * @return  array    The default data is an empty array.
-	 */
-	protected function loadFormData()
-	{
-		$app = JFactory::getApplication();
-		$data = $app->getUserState($this->option . '.edit.' . $this->name . '.data', array());
-		
-		if(empty($data))
-		{
-			$data = $this->getItem();
-		}
-		
-		return $data;
-	}
-	
-	/**
-	 * Method to get a single record.
-	 *
-	 * @param	integer	The id of the primary key.
-	 *
-	 * @return	mixed	Object on success, false on failure.
-	 * @since	1.6
-	 */
-	public function getItem($pk = null)
-	{
-		if (!$item = parent::getItem($pk))
-		{			
-			throw new Exception('Failed to load item');
-		}
-
-		if (!$item->id)
-		{
-			$item->created_by = JFactory::getUser()->get('id');
-		}
-		
-		return $item;
+		return $items;
 	}
 }
 ?>

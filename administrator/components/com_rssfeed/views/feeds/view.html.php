@@ -10,25 +10,26 @@ defined("_JEXEC") or die("Restricted access");
 require_once JPATH_COMPONENT.'/helpers/rssfeed.php';
 
 /**
- * Feeds item view class.
+ * Feeds list view class.
  *
  * @package     Rssfeed
  * @subpackage  Views
  */
 class RssfeedViewFeeds extends JViewLegacy
 {
-	protected $item;
-	protected $form;
+	protected $items;
+	protected $pagination;
 	protected $state;
-
+	
 	public function display($tpl = null)
 	{
-		JFactory::getApplication()->input->set('hidemainmenu', true);
-		
-		$this->form  = $this->getModel()->getForm();
-		$this->item  = $this->getModel()->getItem();
-		$this->state = $this->getModel()->getState();
-		
+		$this->items		 = $this->getModel()->getItems();
+		$this->state		 = $this->getModel()->getState();
+		$this->pagination	 = $this->getModel()->getPagination();
+		$this->authors		 = $this->getModel()->getAuthors();
+		$this->filterForm    = $this->getModel()->getFilterForm();
+		$this->activeFilters = $this->getModel()->getActiveFilters();
+
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
 		{
@@ -36,48 +37,63 @@ class RssfeedViewFeeds extends JViewLegacy
 			return false;
 		}
 		
-		if ($this->getLayout() == 'modal')
+		RssfeedHelper::addSubmenu('feeds');
+		
+		// We don't need toolbar in the modal window.
+		if ($this->getLayout() !== 'modal')
 		{
-			$this->form->setFieldAttribute('catid', 'readonly', 'true');
+			$this->addToolbar();
+			$this->sidebar = JHtmlSidebar::render();
 		}
-
-		$this->addToolbar();
+		
 		parent::display($tpl);
 	}
 	
+	/**
+	 *	Method to add a toolbar
+	 */
 	protected function addToolbar()
 	{
-		$user		= JFactory::getUser();
-		$isNew		= ($this->item->id == 0);
-		$canDo		= RssfeedHelper::getActions();
+		$state	= $this->get('State');
+		$canDo	= RssfeedHelper::getActions();
+		$user	= JFactory::getUser();
+
+		// Get the toolbar object instance
+		$bar = JToolBar::getInstance('toolbar');
 		
 		JToolBarHelper::title(JText::_('COM_RSSFEED_FEED_VIEW_FEEDS_TITLE'));
-
-		if (isset($this->item->checked_out)) {
-		    $checkedOut	= !($this->item->checked_out == 0 || $this->item->checked_out == $user->get('id'));
-        } else {
-            $checkedOut = false;
-        }
 		
-		// If not checked out, can save the item.
-		if (!$checkedOut && ($canDo->get('core.edit')||($canDo->get('core.create'))))
+		if ($canDo->get('core.create') || (count($user->getAuthorisedCategories('com_rssfeed', 'core.create'))) > 0 )
 		{
+			JToolBarHelper::addNew('feed.add','JTOOLBAR_NEW');
+		}
 
-			JToolBarHelper::apply('feeds.apply', 'JTOOLBAR_APPLY');
-			JToolBarHelper::save('feeds.save', 'JTOOLBAR_SAVE');
+		if (($canDo->get('core.edit') || $canDo->get('core.edit.own')) && isset($this->items[0]))
+		{
+			JToolBarHelper::editList('feed.edit','JTOOLBAR_EDIT');
 		}
-		if (!$checkedOut && ($canDo->get('core.create'))){
-			JToolBarHelper::custom('feeds.save2new', 'save-new.png', 'save-new_f2.png', 'JTOOLBAR_SAVE_AND_NEW', false);
+		
+		if ($canDo->get('core.delete') && isset($this->items[0]))
+		{
+            JToolBarHelper::deleteList('', 'feeds.delete','JTOOLBAR_DELETE');
 		}
-		// If an existing item, can save to a copy.
-		if (!$isNew && $canDo->get('core.create')) {
-			JToolBarHelper::custom('feeds.save2copy', 'save-copy.png', 'save-copy_f2.png', 'JTOOLBAR_SAVE_AS_COPY', false);
+		
+		// Add a batch button
+		if (isset($this->items[0]) && $user->authorise('core.create', 'com_contacts') && $user->authorise('core.edit', 'com_contacts'))
+		{
+			JHtml::_('bootstrap.modal', 'collapseModal');
+			$title = JText::_('JTOOLBAR_BATCH');
+
+			// Instantiate a new JLayoutFile instance and render the batch button
+			$layout = new JLayoutFile('joomla.toolbar.batch');
+
+			$dhtml = $layout->render(array('title' => $title));
+			$bar->appendButton('Custom', $dhtml, 'batch');
 		}
-		if (empty($this->item->id)) {
-			JToolBarHelper::cancel('feeds.cancel', 'JTOOLBAR_CANCEL');
-		}
-		else {
-			JToolBarHelper::cancel('feeds.cancel', 'JTOOLBAR_CLOSE');
+		
+		if ($canDo->get('core.admin'))
+		{
+			JToolBarHelper::preferences('com_rssfeed');
 		}
 	}
 }

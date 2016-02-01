@@ -15,7 +15,7 @@ class RssfeedController extends JControllerLegacy
 	 * @var    string
 	 * @since  12.2
 	 */
-	protected $default_view = 'feedss';
+	protected $default_view = 'feeds';
 	
 	/**
 	 * Checks whether a user can see this view.
@@ -46,7 +46,7 @@ class RssfeedController extends JControllerLegacy
 		$document	= JFactory::getDocument();
 
 		// Set the default view name and format from the Request.
-		$vName   = $this->input->getCmd('view', 'feedss');
+		$vName   = $this->input->getCmd('view', 'feeds');
 		$vFormat = $document->getType();
 		$lName   = $this->input->getCmd('layout', 'default');
 		
